@@ -1,0 +1,30 @@
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+
+# React i Node
+node_modules/
+dist/
+coverage/
+npm-debug.log*
+
+# Lokalna konfiguracija i tajni podaci
+.env
+appsettings.Local.json
+**/appsettings.Local.json
+
+# Razvojni alati
+.vscode/
+.idea/
+
+# Operativni sistem
+.DS_Store
+Thumbs.db
+
+# Privremeni fajlovi
+*.tmp
+*.log
