@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Salon.Api.Dto;
 using Salon.Domen.Entiteti;
 using Salon.Infrastruktura.Podaci;
+using System.Text.Json;
 
 namespace Salon.Api.Controllers;
 
@@ -11,24 +13,44 @@ namespace Salon.Api.Controllers;
 public class OsnovneInformacijeController : ControllerBase
 {
     private readonly SalonKontekst _kontekst;
+    private readonly IDistributedCache _cache;
 
-    // Dobijanje pristupa bazi podataka
-    public OsnovneInformacijeController(SalonKontekst kontekst)
+    private const string CacheKljuc = "osnovne-informacije";
+
+    // Dobijanje pristupa bazi i Redis cache-u
+    public OsnovneInformacijeController(
+        SalonKontekst kontekst,
+        IDistributedCache cache)
     {
         _kontekst = kontekst;
+        _cache = cache;
     }
 
     // Prikaz osnovnih informacija salona
     [HttpGet]
     public async Task<ActionResult<OsnovneInformacijeDto>> Get()
     {
+        // Prvo se proverava Redis cache
+        var kesiraniPodaci = await _cache.GetStringAsync(CacheKljuc);
+
+        if (kesiraniPodaci != null)
+        {
+            var kesiraniOdgovor =
+                JsonSerializer.Deserialize<OsnovneInformacijeDto>(
+                    kesiraniPodaci);
+
+            return Ok(kesiraniOdgovor);
+        }
+
+        // Ako nema cache-a, podaci se citaju iz baze
         var informacije = await _kontekst.OsnovneInformacije
             .AsNoTracking()
             .FirstOrDefaultAsync();
 
         if (informacije == null)
         {
-            return NotFound("Osnovne informacije salona jos nisu unete.");
+            return NotFound(
+                "Osnovne informacije salona jos nisu unete.");
         }
 
         var odgovor = new OsnovneInformacijeDto
@@ -38,6 +60,16 @@ public class OsnovneInformacijeController : ControllerBase
             Opis = informacije.Opis,
             RadnoVreme = informacije.RadnoVreme
         };
+
+        // Cuvanje podataka u Redis cache-u
+        await _cache.SetStringAsync(
+            CacheKljuc,
+            JsonSerializer.Serialize(odgovor),
+            new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow =
+                    TimeSpan.FromMinutes(30)
+            });
 
         return Ok(odgovor);
     }
@@ -64,6 +96,9 @@ public class OsnovneInformacijeController : ControllerBase
 
         // Cuvanje promena u bazi
         await _kontekst.SaveChangesAsync();
+
+        // Brisanje starih podataka iz cache-a
+        await _cache.RemoveAsync(CacheKljuc);
 
         var odgovor = new OsnovneInformacijeDto
         {

@@ -14,6 +14,15 @@ builder.Services.AddDbContext<SalonKontekst>(options =>
         connectionString,
         ServerVersion.AutoDetect(connectionString)));
 
+// Povezivanje aplikacije sa Redis cache-om
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration =
+        builder.Configuration.GetConnectionString("Redis");
+
+    options.InstanceName = "SalonTrac:";
+});
+
 // Registracija kontrolera
 builder.Services.AddControllers();
 
