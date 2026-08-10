@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Salon.Infrastruktura.Podaci;
 
@@ -11,9 +12,11 @@ using Salon.Infrastruktura.Podaci;
 namespace Salon.Infrastruktura.Podaci.Migracije
 {
     [DbContext(typeof(SalonKontekst))]
-    partial class SalonKontekstModelSnapshot : ModelSnapshot
+    [Migration("20260810123649_DodajRezervacije")]
+    partial class DodajRezervacije
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
