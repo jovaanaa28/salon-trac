@@ -15,7 +15,7 @@ Projekat se realizuje prema varijanti arhitekture C.
 - TypeScript
 - ASP.NET Core Web API
 - .NET Worker Service
-- PostgreSQL
+- MySQL
 - Redis
 - RabbitMQ
 
