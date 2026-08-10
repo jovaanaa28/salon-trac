@@ -1,23 +1,37 @@
+using Microsoft.EntityFrameworkCore;
+using Salon.Infrastruktura.Podaci;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Ucitavanje konekcije ka bazi
+var connectionString = builder.Configuration.GetConnectionString("SalonBaza")
+    ?? throw new InvalidOperationException(
+        "Connection string 'SalonBaza' nije konfigurisan.");
 
+// Povezivanje Entity Framework-a sa MariaDB bazom
+builder.Services.AddDbContext<SalonKontekst>(options =>
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)));
+
+// Registracija kontrolera
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+// OpenAPI dokumentacija
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// OpenAPI je dostupan u razvojnom okruzenju
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
+// Povezivanje API ruta sa kontrolerima
 app.MapControllers();
 
 app.Run();
