@@ -1,16 +1,165 @@
+using System.Text;
+using System.Text.Json;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using Salon.Infrastruktura.Servisi;
+using Zajednicko.Poruke.Komande;
+
 namespace Salon.Radnik;
 
-public class Worker(ILogger<Worker> logger) : BackgroundService
+public class Worker(
+    ILogger<Worker> logger,
+    IConfiguration configuration,
+    IServiceScopeFactory scopeFactory)
+    : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(
+        CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        var hostName = configuration["RabbitMq:HostName"]
+            ?? throw new InvalidOperationException(
+                "RabbitMq:HostName nije konfigurisan.");
+
+        var userName = configuration["RabbitMq:UserName"]
+            ?? throw new InvalidOperationException(
+                "RabbitMq:UserName nije konfigurisan.");
+
+        var password = configuration["RabbitMq:Password"]
+            ?? throw new InvalidOperationException(
+                "RabbitMq:Password nije konfigurisan.");
+
+        var queueName = configuration["RabbitMq:QueueName"]
+            ?? throw new InvalidOperationException(
+                "RabbitMq:QueueName nije konfigurisan.");
+
+        var port =
+            configuration.GetValue<int>("RabbitMq:Port");
+
+        var factory = new ConnectionFactory
         {
-            if (logger.IsEnabled(LogLevel.Information))
+            HostName = hostName,
+            Port = port,
+            UserName = userName,
+            Password = password
+        };
+
+        await using var connection =
+            await factory.CreateConnectionAsync(stoppingToken);
+
+        await using var channel =
+            await connection.CreateChannelAsync(
+                cancellationToken: stoppingToken);
+
+        // Isti queue koji koristi Salon.Api
+        await channel.QueueDeclareAsync(
+            queue: queueName,
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null,
+            cancellationToken: stoppingToken);
+
+        // Worker obradjuje jednu poruku pre uzimanja sledece
+        await channel.BasicQosAsync(
+            prefetchSize: 0,
+            prefetchCount: 1,
+            global: false,
+            cancellationToken: stoppingToken);
+
+        var consumer =
+            new AsyncEventingBasicConsumer(channel);
+
+        consumer.ReceivedAsync += async (_, ea) =>
+        {
+            // Kopiranje tela poruke pre obrade
+            var body = ea.Body.ToArray();
+
+            try
             {
-                logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                var json =
+                    Encoding.UTF8.GetString(body);
+
+                var komanda =
+                    JsonSerializer.Deserialize<
+                        KreirajRezervacijuKomanda>(json);
+
+                if (komanda == null)
+                {
+                    throw new ArgumentException(
+                        "RabbitMQ poruka nije validna.");
+                }
+
+                using var scope =
+                    scopeFactory.CreateScope();
+
+                var obrada =
+                    scope.ServiceProvider
+                        .GetRequiredService<
+                            ObradaRezervacijeService>();
+
+                await obrada.ObradiAsync(
+                    komanda,
+                    ea.CancellationToken);
+
+                // Poruka se uklanja tek nakon uspesne obrade
+                await channel.BasicAckAsync(
+                    ea.DeliveryTag,
+                    multiple: false,
+                    cancellationToken:
+                        ea.CancellationToken);
+
+                logger.LogInformation(
+                    "Rezervacija uspesno obradjena. Id zahteva: {IdZahteva}",
+                    komanda.IdZahteva);
             }
-            await Task.Delay(1000, stoppingToken);
+            catch (ArgumentException ex)
+            {
+                // Poslovno neispravan zahtev se ne upisuje u bazu
+                logger.LogWarning(
+                    "Rezervacija je odbijena: {Poruka}",
+                    ex.Message);
+
+                await channel.BasicAckAsync(
+                    ea.DeliveryTag,
+                    multiple: false,
+                    cancellationToken:
+                        ea.CancellationToken);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "Greska tokom obrade RabbitMQ poruke.");
+
+                // Ne vracamo poruku beskrajno u isti queue
+                await channel.BasicNackAsync(
+                    ea.DeliveryTag,
+                    multiple: false,
+                    requeue: false,
+                    cancellationToken:
+                        ea.CancellationToken);
+            }
+        };
+
+        await channel.BasicConsumeAsync(
+            queue: queueName,
+            autoAck: false,
+            consumer: consumer,
+            cancellationToken: stoppingToken);
+
+        logger.LogInformation(
+            "Worker slusa RabbitMQ queue: {QueueName}",
+            queueName);
+
+        try
+        {
+            await Task.Delay(
+                Timeout.Infinite,
+                stoppingToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // Normalno gasenje Worker-a
         }
     }
 }
