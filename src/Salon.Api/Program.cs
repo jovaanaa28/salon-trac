@@ -1,6 +1,7 @@
+using Salon.Api.Servisi;
 using Microsoft.EntityFrameworkCore;
 using Salon.Infrastruktura.Podaci;
-using Salon.Infrastruktura.Servisi; 
+using Salon.Infrastruktura.Servisi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,21 +31,24 @@ builder.Services.AddControllers();
 // OpenAPI dokumentacija
 builder.Services.AddOpenApi();
 
-// Poslovna logika termina 
-builder.Services.AddScoped<TerminService>(); 
+// Poslovna logika termina
+builder.Services.AddScoped<TerminService>();
 
 // Obracun popusta i cene
 builder.Services.AddScoped<ObracunCeneService>();
 
-// Generisanje sifre rezervacije i promo-koda 
-builder.Services.AddScoped<GeneratorKodovaService>(); 
+// Generisanje sifre rezervacije i promo-koda
+builder.Services.AddScoped<GeneratorKodovaService>();
 
-// Otvoreni API za devizni kurs 
-builder.Services.AddHttpClient<KursService>(client => 
-{ 
-    client.BaseAddress = new Uri("https://api.frankfurter.dev/v2/"); 
-    client.Timeout = TimeSpan.FromSeconds(10); 
-}); 
+// Slanje komandi u RabbitMQ
+builder.Services.AddScoped<RabbitMqPublisherService>();
+
+// Otvoreni API za devizni kurs
+builder.Services.AddHttpClient<KursService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.frankfurter.dev/v2/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 var app = builder.Build();
 
