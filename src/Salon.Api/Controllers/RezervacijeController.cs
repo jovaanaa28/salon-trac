@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Salon.Api.Dto;
 using Salon.Api.Servisi;
+using Salon.Domen.Entiteti;
+using Salon.Domen.Enumeracije;
+using Salon.Infrastruktura.Podaci;
 using Zajednicko.Poruke.Komande;
 
 namespace Salon.Api.Controllers;
@@ -10,11 +14,14 @@ namespace Salon.Api.Controllers;
 public class RezervacijeController : ControllerBase
 {
     private readonly RabbitMqPublisherService _publisher;
+    private readonly SalonKontekst _kontekst;
 
     public RezervacijeController(
-        RabbitMqPublisherService publisher)
+        RabbitMqPublisherService publisher,
+        SalonKontekst kontekst)
     {
         _publisher = publisher;
+        _kontekst = kontekst;
     }
 
     // Slanje zahteva za novu rezervaciju na asinhronu obradu
@@ -52,15 +59,72 @@ public class RezervacijeController : ControllerBase
                 .ToList()
         };
 
-        // Rezervacija se prvo salje u message queue
-        await _publisher.PosaljiKreiranjeRezervacijeAsync(
-            komanda,
-            cancellationToken);
+        // Cuvamo samo status zahteva, ne samu rezervaciju
+        var pracenje = new ZahtevZaRezervaciju
+        {
+            IdZahteva = komanda.IdZahteva,
+            Status = StatusObradeRezervacije.NA_CEKANJU,
+            Poruka = "Zahtev ceka obradu.",
+            DatumKreiranja = DateTime.UtcNow,
+            DatumIzmene = DateTime.UtcNow
+        };
+
+        _kontekst.ZahteviZaRezervaciju.Add(pracenje);
+        await _kontekst.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            // Rezervacija se salje u message queue
+            await _publisher.PosaljiKreiranjeRezervacijeAsync(
+                komanda,
+                cancellationToken);
+        }
+        catch
+        {
+            pracenje.Status = StatusObradeRezervacije.ODBIJENA;
+            pracenje.Poruka =
+                "Zahtev nije mogao biti poslat na obradu.";
+            pracenje.DatumIzmene = DateTime.UtcNow;
+
+            await _kontekst.SaveChangesAsync(cancellationToken);
+
+            throw;
+        }
 
         return Accepted(new
         {
             IdZahteva = komanda.IdZahteva,
+            Status = pracenje.Status.ToString(),
             Poruka = "Zahtev za rezervaciju je primljen."
+        });
+    }
+
+    // Provera statusa asinhrone obrade
+    [HttpGet("status/{idZahteva:guid}")]
+    public async Task<IActionResult> Status(
+        Guid idZahteva,
+        CancellationToken cancellationToken)
+    {
+        var zahtev = await _kontekst.ZahteviZaRezervaciju
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                z => z.IdZahteva == idZahteva,
+                cancellationToken);
+
+        if (zahtev == null)
+        {
+            return NotFound(
+                "Zahtev sa tim identifikatorom nije pronadjen.");
+        }
+
+        return Ok(new
+        {
+            zahtev.IdZahteva,
+            Status = zahtev.Status.ToString(),
+            zahtev.Poruka,
+            zahtev.RezervacijaId,
+            zahtev.DatumKreiranja,
+            zahtev.DatumIzmene
         });
     }
 }

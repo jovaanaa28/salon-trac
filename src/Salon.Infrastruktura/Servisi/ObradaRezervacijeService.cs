@@ -26,7 +26,7 @@ public class ObradaRezervacijeService
     }
 
     // Provera i cuvanje rezervacije preuzete iz RabbitMQ-a
-    public async Task ObradiAsync(
+    public async Task<int> ObradiAsync(
         KreirajRezervacijuKomanda komanda,
         CancellationToken cancellationToken)
     {
@@ -248,6 +248,9 @@ public class ObradaRezervacijeService
 
             await transakcija.CommitAsync(
                 cancellationToken);
+
+
+            return rezervacija.Id;
         }
         catch
         {

@@ -1,7 +1,10 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Salon.Domen.Enumeracije;
+using Salon.Infrastruktura.Podaci;
 using Salon.Infrastruktura.Servisi;
 using Zajednicko.Poruke.Komande;
 
@@ -71,15 +74,16 @@ public class Worker(
 
         consumer.ReceivedAsync += async (_, ea) =>
         {
-            // Kopiranje tela poruke pre obrade
             var body = ea.Body.ToArray();
+
+            KreirajRezervacijuKomanda? komanda = null;
 
             try
             {
                 var json =
                     Encoding.UTF8.GetString(body);
 
-                var komanda =
+                komanda =
                     JsonSerializer.Deserialize<
                         KreirajRezervacijuKomanda>(json);
 
@@ -89,19 +93,38 @@ public class Worker(
                         "RabbitMQ poruka nije validna.");
                 }
 
-                using var scope =
-                    scopeFactory.CreateScope();
-
-                var obrada =
-                    scope.ServiceProvider
-                        .GetRequiredService<
-                            ObradaRezervacijeService>();
-
-                await obrada.ObradiAsync(
-                    komanda,
+                // Worker je preuzeo zahtev
+                await AzurirajStatusAsync(
+                    komanda.IdZahteva,
+                    StatusObradeRezervacije.U_OBRADI,
+                    "Zahtev se trenutno obradjuje.",
+                    null,
                     ea.CancellationToken);
 
-                // Poruka se uklanja tek nakon uspesne obrade
+                int rezervacijaId;
+
+                // Poseban scope za samu obradu rezervacije
+                using (var scope = scopeFactory.CreateScope())
+                {
+                    var obrada =
+                        scope.ServiceProvider
+                            .GetRequiredService<
+                                ObradaRezervacijeService>();
+
+                    rezervacijaId =
+                        await obrada.ObradiAsync(
+                            komanda,
+                            ea.CancellationToken);
+                }
+
+                // Uspesna obrada
+                await AzurirajStatusAsync(
+                    komanda.IdZahteva,
+                    StatusObradeRezervacije.USPESNA,
+                    "Rezervacija je uspesno kreirana.",
+                    rezervacijaId,
+                    ea.CancellationToken);
+
                 await channel.BasicAckAsync(
                     ea.DeliveryTag,
                     multiple: false,
@@ -114,7 +137,16 @@ public class Worker(
             }
             catch (ArgumentException ex)
             {
-                // Poslovno neispravan zahtev se ne upisuje u bazu
+                if (komanda != null)
+                {
+                    await AzurirajStatusAsync(
+                        komanda.IdZahteva,
+                        StatusObradeRezervacije.ODBIJENA,
+                        ex.Message,
+                        null,
+                        ea.CancellationToken);
+                }
+
                 logger.LogWarning(
                     "Rezervacija je odbijena: {Poruka}",
                     ex.Message);
@@ -127,11 +159,29 @@ public class Worker(
             }
             catch (Exception ex)
             {
+                if (komanda != null)
+                {
+                    try
+                    {
+                        await AzurirajStatusAsync(
+                            komanda.IdZahteva,
+                            StatusObradeRezervacije.ODBIJENA,
+                            "Doslo je do greske tokom obrade zahteva.",
+                            null,
+                            ea.CancellationToken);
+                    }
+                    catch (Exception statusEx)
+                    {
+                        logger.LogError(
+                            statusEx,
+                            "Status zahteva nije mogao biti azuriran.");
+                    }
+                }
+
                 logger.LogError(
                     ex,
                     "Greska tokom obrade RabbitMQ poruke.");
 
-                // Ne vracamo poruku beskrajno u isti queue
                 await channel.BasicNackAsync(
                     ea.DeliveryTag,
                     multiple: false,
@@ -161,5 +211,43 @@ public class Worker(
         {
             // Normalno gasenje Worker-a
         }
+    }
+
+    // Promena statusa zahteva koristi poseban DbContext
+    private async Task AzurirajStatusAsync(
+        Guid idZahteva,
+        StatusObradeRezervacije status,
+        string poruka,
+        int? rezervacijaId,
+        CancellationToken cancellationToken)
+    {
+        using var scope = scopeFactory.CreateScope();
+
+        var kontekst =
+            scope.ServiceProvider
+                .GetRequiredService<SalonKontekst>();
+
+        var zahtev =
+            await kontekst.ZahteviZaRezervaciju
+                .FirstOrDefaultAsync(
+                    z => z.IdZahteva == idZahteva,
+                    cancellationToken);
+
+        if (zahtev == null)
+        {
+            logger.LogWarning(
+                "Status za zahtev {IdZahteva} nije pronadjen.",
+                idZahteva);
+
+            return;
+        }
+
+        zahtev.Status = status;
+        zahtev.Poruka = poruka;
+        zahtev.RezervacijaId = rezervacijaId;
+        zahtev.DatumIzmene = DateTime.UtcNow;
+
+        await kontekst.SaveChangesAsync(
+            cancellationToken);
     }
 }

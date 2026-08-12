@@ -18,6 +18,8 @@ public class SalonKontekst : DbContext
     public DbSet<Rezervacija> Rezervacije { get; set; }
     public DbSet<StavkaRezervacije> StavkeRezervacija { get; set; }
     public DbSet<PromoKod> PromoKodovi { get; set; }
+    public DbSet<ZahtevZaRezervaciju> ZahteviZaRezervaciju { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -99,5 +101,30 @@ public class SalonKontekst : DbContext
         .WithOne()
         .HasForeignKey<PromoKod>(p => p.RezervacijaId)
         .OnDelete(DeleteBehavior.Cascade);
+
+    // Id zahteva mora biti jedinstven
+modelBuilder.Entity<ZahtevZaRezervaciju>()
+    .HasIndex(z => z.IdZahteva)
+    .IsUnique();
+
+// Status obrade se u bazi cuva kao tekst
+modelBuilder.Entity<ZahtevZaRezervaciju>()
+    .Property(z => z.Status)
+    .HasConversion<string>();
+
+modelBuilder.Entity<ZahtevZaRezervaciju>()
+    .Property(z => z.Poruka)
+    .HasMaxLength(500);
+
+// Veza sa kreiranom rezervacijom
+modelBuilder.Entity<ZahtevZaRezervaciju>()
+    .HasOne(z => z.Rezervacija)
+    .WithMany()
+    .HasForeignKey(z => z.RezervacijaId)
+    .OnDelete(DeleteBehavior.SetNull);
+
+
+
+
         }
 }
