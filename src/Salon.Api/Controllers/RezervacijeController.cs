@@ -70,7 +70,9 @@ public class RezervacijeController : ControllerBase
         };
 
         _kontekst.ZahteviZaRezervaciju.Add(pracenje);
-        await _kontekst.SaveChangesAsync(cancellationToken);
+
+        await _kontekst.SaveChangesAsync(
+            cancellationToken);
 
         try
         {
@@ -81,12 +83,17 @@ public class RezervacijeController : ControllerBase
         }
         catch
         {
-            pracenje.Status = StatusObradeRezervacije.ODBIJENA;
+            pracenje.Status =
+                StatusObradeRezervacije.ODBIJENA;
+
             pracenje.Poruka =
                 "Zahtev nije mogao biti poslat na obradu.";
-            pracenje.DatumIzmene = DateTime.UtcNow;
 
-            await _kontekst.SaveChangesAsync(cancellationToken);
+            pracenje.DatumIzmene =
+                DateTime.UtcNow;
+
+            await _kontekst.SaveChangesAsync(
+                cancellationToken);
 
             throw;
         }
@@ -95,7 +102,8 @@ public class RezervacijeController : ControllerBase
         {
             IdZahteva = komanda.IdZahteva,
             Status = pracenje.Status.ToString(),
-            Poruka = "Zahtev za rezervaciju je primljen."
+            Poruka =
+                "Zahtev za rezervaciju je primljen."
         });
     }
 
@@ -105,16 +113,43 @@ public class RezervacijeController : ControllerBase
         Guid idZahteva,
         CancellationToken cancellationToken)
     {
-        var zahtev = await _kontekst.ZahteviZaRezervaciju
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                z => z.IdZahteva == idZahteva,
-                cancellationToken);
+        var zahtev =
+            await _kontekst.ZahteviZaRezervaciju
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    z => z.IdZahteva == idZahteva,
+                    cancellationToken);
 
         if (zahtev == null)
         {
             return NotFound(
                 "Zahtev sa tim identifikatorom nije pronadjen.");
+        }
+
+        string? sifra = null;
+        string? promoKod = null;
+
+        // Sifra i promo kod postoje tek nakon uspesne obrade
+        if (zahtev.Status ==
+                StatusObradeRezervacije.USPESNA &&
+            zahtev.RezervacijaId.HasValue)
+        {
+            sifra = await _kontekst.Rezervacije
+                .AsNoTracking()
+                .Where(r =>
+                    r.Id == zahtev.RezervacijaId.Value)
+                .Select(r => r.Sifra)
+                .FirstOrDefaultAsync(
+                    cancellationToken);
+
+            promoKod = await _kontekst.PromoKodovi
+                .AsNoTracking()
+                .Where(p =>
+                    p.RezervacijaId ==
+                    zahtev.RezervacijaId.Value)
+                .Select(p => p.Kod)
+                .FirstOrDefaultAsync(
+                    cancellationToken);
         }
 
         return Ok(new
@@ -123,8 +158,118 @@ public class RezervacijeController : ControllerBase
             Status = zahtev.Status.ToString(),
             zahtev.Poruka,
             zahtev.RezervacijaId,
+
+            Sifra = sifra,
+            PromoKod = promoKod,
+
             zahtev.DatumKreiranja,
             zahtev.DatumIzmene
         });
+    }
+
+    // Pristup postojecoj rezervaciji preko email-a i sifre
+    [HttpPost("pristup")]
+    public async Task<IActionResult> Pristup(
+        PristupRezervacijiDto zahtev,
+        CancellationToken cancellationToken)
+    {
+        var email = zahtev.Email.Trim();
+
+        var sifra =
+            zahtev.Sifra
+                .Trim()
+                .ToUpperInvariant();
+
+        // Provera kombinacije email + pristupna sifra
+        var rezervacija =
+            await _kontekst.Rezervacije
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    r =>
+                        r.Email.ToLower() ==
+                            email.ToLower() &&
+                        r.Sifra == sifra,
+                    cancellationToken);
+
+        if (rezervacija == null)
+        {
+            return NotFound(
+                "Rezervacija nije pronadjena.");
+        }
+
+        // Ucitavanje svih usluga rezervacije
+        var stavke =
+            await _kontekst.StavkeRezervacija
+                .AsNoTracking()
+                .Where(s =>
+                    s.RezervacijaId ==
+                    rezervacija.Id)
+                .Select(s =>
+                    new StavkaRezervacijeDetaljiDto
+                    {
+                        Id = s.Id,
+                        UslugaId = s.UslugaId,
+                        NazivUsluge =
+                            s.Usluga.Naziv,
+                        Datum = s.Datum,
+                        VremePocetka =
+                            s.VremePocetka,
+                        CenaRsd = s.Cena
+                    })
+                .ToListAsync(
+                    cancellationToken);
+
+        // Promo kod generisan ovom rezervacijom
+        var promoKod =
+            await _kontekst.PromoKodovi
+                .AsNoTracking()
+                .Where(p =>
+                    p.RezervacijaId ==
+                    rezervacija.Id)
+                .Select(p => p.Kod)
+                .FirstOrDefaultAsync(
+                    cancellationToken);
+
+        var rezultat =
+            new RezervacijaDetaljiDto
+            {
+                Id = rezervacija.Id,
+
+                Ime = rezervacija.Ime,
+                Prezime = rezervacija.Prezime,
+                Email = rezervacija.Email,
+
+                Status =
+                    rezervacija.Status.ToString(),
+
+                IzabranaValuta =
+                    rezervacija.IzabranaValuta,
+
+                UkupnaCena =
+                    rezervacija.UkupnaCena,
+
+                Popust =
+                    rezervacija.Popust,
+
+                KonacnaCena =
+                    rezervacija.KonacnaCena,
+
+                Kurs =
+                    rezervacija.Kurs,
+
+                DatumKreiranja =
+                    rezervacija.DatumKreiranja,
+
+                DatumOtkazivanja =
+                    rezervacija.DatumOtkazivanja,
+
+                PromoKod =
+                    promoKod,
+
+                Stavke =
+                    stavke
+            };
+
+        return Ok(rezultat);
     }
 }
