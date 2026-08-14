@@ -55,6 +55,8 @@ builder.Services.AddHttpClient<KursService>(client =>
 
 // Salon.Api/Program.cs 
 builder.Services.AddScoped<UpravljanjeRezervacijomService>(); 
+builder.Services.AddScoped<RabbitMqDogadjajPublisherService>();
+//builder.Services.AddScoped<RezervacijaDogadjajService>();
 
 var app = builder.Build();
 

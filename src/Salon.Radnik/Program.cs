@@ -33,6 +33,10 @@ builder.Services.AddHttpClient<KursService>(client =>
 // Background Worker
 builder.Services.AddHostedService<Worker>();
 
+builder.Services.AddScoped<RabbitMqDogadjajPublisherService>();
+//builder.Services.AddScoped<RezervacijaDogadjajService>();
+
+
 var host = builder.Build();
 
 host.Run();
