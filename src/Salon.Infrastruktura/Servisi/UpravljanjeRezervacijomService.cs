@@ -204,4 +204,51 @@ public class UpravljanjeRezervacijomService
             throw;
         }
     }
+
+    // Otkazivanje postojece rezervacije
+public async Task OtkaziAsync(
+    int rezervacijaId,
+    string email,
+    string sifra,
+    CancellationToken cancellationToken)
+{
+    var rezervacija = await PronadjiRezervacijuAsync(
+        rezervacijaId, email, sifra, cancellationToken);
+
+    if (rezervacija.Status != StatusRezervacije.AKTIVNA)
+        throw new ArgumentException(
+            "Rezervacija je vec otkazana.");
+
+    await using var transakcija = await _kontekst.Database
+        .BeginTransactionAsync(cancellationToken);
+
+    try
+    {
+        rezervacija.Status = StatusRezervacije.OTKAZANA;
+        rezervacija.DatumOtkazivanja = DateTime.UtcNow;
+
+        // Promo kod koji je generisala ova rezervacija
+        var promoKod = await _kontekst.PromoKodovi
+            .FirstOrDefaultAsync(
+                p => p.RezervacijaId == rezervacija.Id,
+                cancellationToken);
+
+        // Samo neiskoriscen promo kod postaje nevazeci.
+        // Ako je vec iskoriscen, ostaje ISKORISCEN.
+        if (promoKod != null &&
+            promoKod.Status == StatusPromoKoda.DOSTUPAN)
+        {
+            promoKod.Status = StatusPromoKoda.NEVAZECI;
+        }
+
+        await _kontekst.SaveChangesAsync(cancellationToken);
+
+        await transakcija.CommitAsync(cancellationToken);
+    }
+    catch
+    {
+        await transakcija.RollbackAsync(cancellationToken);
+        throw;
+    }
+}
 }
