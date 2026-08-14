@@ -156,48 +156,6 @@ public class UpravljanjeRezervacijomService
         }
     }
 
-    // Otkazivanje rezervacije
-    public async Task OtkaziAsync(
-        int rezervacijaId,
-        string email,
-        string sifra,
-        CancellationToken cancellationToken)
-    {
-        var rezervacija = await PronadjiRezervacijuAsync(
-            rezervacijaId, email, sifra, cancellationToken);
-
-        if (rezervacija.Status != StatusRezervacije.AKTIVNA)
-            throw new ArgumentException("Rezervacija nije aktivna.");
-
-        await using var transakcija = await _kontekst.Database
-            .BeginTransactionAsync(cancellationToken);
-
-        try
-        {
-            rezervacija.Status = StatusRezervacije.OTKAZANA;
-            rezervacija.DatumOtkazivanja = DateTime.UtcNow;
-
-            // Ako postoji promo kod vezan za rezervaciju i jos uvek je dostupan,
-            // oznacimo ga kao nevažeći
-            var promo = await _kontekst.PromoKodovi
-                .FirstOrDefaultAsync(p => p.RezervacijaId == rezervacija.Id,
-                    cancellationToken);
-
-            if (promo != null && promo.Status == Domen.Enumeracije.StatusPromoKoda.DOSTUPAN)
-            {
-                promo.Status = Domen.Enumeracije.StatusPromoKoda.NEVAZECI;
-            }
-
-            await _kontekst.SaveChangesAsync(cancellationToken);
-            await transakcija.CommitAsync(cancellationToken);
-        }
-        catch
-        {
-            await transakcija.RollbackAsync(cancellationToken);
-            throw;
-        }
-    }
-
     // Brisanje stavke iz postojeće rezervacije
     public async Task ObrisiStavkuAsync(
         int rezervacijaId,

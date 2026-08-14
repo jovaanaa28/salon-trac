@@ -9,6 +9,7 @@ using Salon.Infrastruktura.Servisi;
 using Zajednicko.Poruke.Komande;
 
 
+
 namespace Salon.Api.Controllers;
 
 [ApiController]
@@ -318,10 +319,11 @@ public class RezervacijeController : ControllerBase
         }
     }
 
+
     [HttpPost("{id:int}/otkazi")]
     public async Task<IActionResult> Otkazi(
         int id,
-        AutorizacijaRezervacijeDto zahtev,
+        PristupRezervacijiDto zahtev,
         CancellationToken cancellationToken)
     {
         try
