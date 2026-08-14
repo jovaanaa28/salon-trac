@@ -53,8 +53,7 @@ builder.Services.AddHttpClient<KursService>(client =>
     client.Timeout = TimeSpan.FromSeconds(10);
 });
 
-// Salon.Api/Program.cs 
-builder.Services.AddScoped<UpravljanjeRezervacijomService>(); 
+
 builder.Services.AddScoped<RabbitMqDogadjajPublisherService>();
 //builder.Services.AddScoped<RezervacijaDogadjajService>();
 
