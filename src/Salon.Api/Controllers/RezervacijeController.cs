@@ -8,6 +8,7 @@ using Salon.Infrastruktura.Podaci;
 using Salon.Infrastruktura.Servisi;
 using Zajednicko.Poruke.Komande;
 
+
 namespace Salon.Api.Controllers;
 
 [ApiController]
@@ -16,7 +17,6 @@ public class RezervacijeController : ControllerBase
 {
     private readonly RabbitMqPublisherService _publisher;
     private readonly SalonKontekst _kontekst;
-
     private readonly UpravljanjeRezervacijomService _upravljanje;
 
     public RezervacijeController(
@@ -297,4 +297,45 @@ public class RezervacijeController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpDelete("{id:int}/stavke/{stavkaId:int}")]
+    public async Task<IActionResult> ObrisiStavku(
+        int id,
+        int stavkaId,
+        [FromBody] AutorizacijaRezervacijeDto zahtev,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _upravljanje.ObrisiStavkuAsync(
+                id, stavkaId, zahtev.Email, zahtev.Sifra, cancellationToken);
+
+            return Ok(new { Poruka = "Usluga je uklonjena iz rezervacije." });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{id:int}/otkazi")]
+    public async Task<IActionResult> Otkazi(
+        int id,
+        AutorizacijaRezervacijeDto zahtev,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _upravljanje.OtkaziAsync(
+                id, zahtev.Email, zahtev.Sifra, cancellationToken);
+
+            return Ok(new { Poruka = "Rezervacija je otkazana." });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
+
+

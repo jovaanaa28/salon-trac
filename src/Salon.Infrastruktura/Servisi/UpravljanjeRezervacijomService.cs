@@ -155,4 +155,95 @@ public class UpravljanjeRezervacijomService
             throw;
         }
     }
+
+    // Otkazivanje rezervacije
+    public async Task OtkaziAsync(
+        int rezervacijaId,
+        string email,
+        string sifra,
+        CancellationToken cancellationToken)
+    {
+        var rezervacija = await PronadjiRezervacijuAsync(
+            rezervacijaId, email, sifra, cancellationToken);
+
+        if (rezervacija.Status != StatusRezervacije.AKTIVNA)
+            throw new ArgumentException("Rezervacija nije aktivna.");
+
+        await using var transakcija = await _kontekst.Database
+            .BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            rezervacija.Status = StatusRezervacije.OTKAZANA;
+            rezervacija.DatumOtkazivanja = DateTime.UtcNow;
+
+            // Ako postoji promo kod vezan za rezervaciju i jos uvek je dostupan,
+            // oznacimo ga kao nevažeći
+            var promo = await _kontekst.PromoKodovi
+                .FirstOrDefaultAsync(p => p.RezervacijaId == rezervacija.Id,
+                    cancellationToken);
+
+            if (promo != null && promo.Status == Domen.Enumeracije.StatusPromoKoda.DOSTUPAN)
+            {
+                promo.Status = Domen.Enumeracije.StatusPromoKoda.NEVAZECI;
+            }
+
+            await _kontekst.SaveChangesAsync(cancellationToken);
+            await transakcija.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await transakcija.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    // Brisanje stavke iz postojeće rezervacije
+    public async Task ObrisiStavkuAsync(
+        int rezervacijaId,
+        int stavkaId,
+        string email,
+        string sifra,
+        CancellationToken cancellationToken)
+    {
+        var rezervacija = await PronadjiRezervacijuAsync(
+            rezervacijaId, email, sifra, cancellationToken);
+
+        if (rezervacija.Status != StatusRezervacije.AKTIVNA)
+            throw new ArgumentException("Otkazana rezervacija ne moze da se menja.");
+
+        var stavka = await _kontekst.StavkeRezervacija
+            .FirstOrDefaultAsync(s =>
+                s.Id == stavkaId && s.RezervacijaId == rezervacija.Id,
+                cancellationToken);
+
+        if (stavka == null)
+            throw new ArgumentException("Stavka nije pronadjena.");
+
+        var brojStavki = await _kontekst.StavkeRezervacija
+            .CountAsync(s => s.RezervacijaId == rezervacija.Id, cancellationToken);
+
+        if (brojStavki <= 1)
+            throw new ArgumentException(
+                "Poslednja usluga se ne uklanja. Otkazite celu rezervaciju.");
+
+        await using var transakcija = await _kontekst.Database
+            .BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            _kontekst.StavkeRezervacija.Remove(stavka);
+            await _kontekst.SaveChangesAsync(cancellationToken);
+
+            await PreracunajCenuAsync(rezervacija, cancellationToken);
+            await _kontekst.SaveChangesAsync(cancellationToken);
+
+            await transakcija.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await transakcija.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
 }
