@@ -40,6 +40,9 @@ builder.Services.AddScoped<ObracunCeneService>();
 // Generisanje sifre rezervacije i promo-koda
 builder.Services.AddScoped<GeneratorKodovaService>();
 
+// Upravljanje rezervacijama (dodavanje stavki, pristup)
+builder.Services.AddScoped<UpravljanjeRezervacijomService>();
+
 // Slanje komandi u RabbitMQ
 builder.Services.AddScoped<RabbitMqPublisherService>();
 
@@ -49,6 +52,9 @@ builder.Services.AddHttpClient<KursService>(client =>
     client.BaseAddress = new Uri("https://api.frankfurter.dev/v2/");
     client.Timeout = TimeSpan.FromSeconds(10);
 });
+
+// Salon.Api/Program.cs 
+builder.Services.AddScoped<UpravljanjeRezervacijomService>(); 
 
 var app = builder.Build();
 

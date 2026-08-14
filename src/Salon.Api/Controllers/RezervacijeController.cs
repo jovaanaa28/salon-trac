@@ -5,6 +5,7 @@ using Salon.Api.Servisi;
 using Salon.Domen.Entiteti;
 using Salon.Domen.Enumeracije;
 using Salon.Infrastruktura.Podaci;
+using Salon.Infrastruktura.Servisi;
 using Zajednicko.Poruke.Komande;
 
 namespace Salon.Api.Controllers;
@@ -16,12 +17,16 @@ public class RezervacijeController : ControllerBase
     private readonly RabbitMqPublisherService _publisher;
     private readonly SalonKontekst _kontekst;
 
+    private readonly UpravljanjeRezervacijomService _upravljanje;
+
     public RezervacijeController(
         RabbitMqPublisherService publisher,
-        SalonKontekst kontekst)
+        SalonKontekst kontekst,
+        UpravljanjeRezervacijomService upravljanje)
     {
         _publisher = publisher;
         _kontekst = kontekst;
+        _upravljanje = upravljanje;
     }
 
     // Slanje zahteva za novu rezervaciju na asinhronu obradu
@@ -271,5 +276,25 @@ public class RezervacijeController : ControllerBase
             };
 
         return Ok(rezultat);
+    }
+
+    [HttpPost("{id:int}/stavke")]
+    public async Task<IActionResult> DodajStavku(
+    int id,
+    DodajStavkuRezervacijeDto zahtev,
+    CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _upravljanje.DodajStavkuAsync(
+                id, zahtev.Email, zahtev.Sifra, zahtev.UslugaId,
+                zahtev.Datum, zahtev.VremePocetka, cancellationToken);
+
+            return Ok(new { Poruka = "Usluga je dodata na rezervaciju." });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
