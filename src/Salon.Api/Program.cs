@@ -50,6 +50,9 @@ builder.Services.AddHttpClient<KursService>(client =>
     client.Timeout = TimeSpan.FromSeconds(10);
 });
 
+builder.Services.AddScoped<RabbitMqDogadjajPublisherService>();
+//builder.Services.AddScoped<RezervacijaDogadjajService>();
+
 var app = builder.Build();
 
 // OpenAPI je dostupan u razvojnom okruzenju
