@@ -55,7 +55,7 @@ builder.Services.AddHttpClient<KursService>(client =>
 
 
 builder.Services.AddScoped<RabbitMqDogadjajPublisherService>();
-//builder.Services.AddScoped<RezervacijaDogadjajService>();
+builder.Services.AddScoped<RezervacijaDogadjajService>();
 
 var app = builder.Build();
 

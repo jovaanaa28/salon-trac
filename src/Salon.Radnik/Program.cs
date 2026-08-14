@@ -34,7 +34,7 @@ builder.Services.AddHttpClient<KursService>(client =>
 builder.Services.AddHostedService<Worker>();
 
 builder.Services.AddScoped<RabbitMqDogadjajPublisherService>();
-//builder.Services.AddScoped<RezervacijaDogadjajService>();
+builder.Services.AddScoped<RezervacijaDogadjajService>();
 
 
 var host = builder.Build();

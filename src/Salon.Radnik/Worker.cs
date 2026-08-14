@@ -117,22 +117,24 @@ public class Worker(
                             ea.CancellationToken);
                 }
 
-                try
-                {
-                    using var eventScope = scopeFactory.CreateScope();
-                    //var dogadjaji = eventScope.ServiceProvider
-                      //  .GetRequiredService<RezervacijaDogadjajService>();
+            try
+            {
+                using var eventScope = scopeFactory.CreateScope();
 
-                   // await dogadjaji.PosaljiKreiranaAsync(
-                   //     rezervacijaId, ea.CancellationToken);
-                }
-                catch (Exception eventEx)
-                {
-                    logger.LogError(
-                        eventEx,
-                        "Rezervacija {RezervacijaId} je sacuvana, ali dogadjaj nije objavljen.",
-                        rezervacijaId);
-                }
+                var dogadjaji = eventScope.ServiceProvider
+                    .GetRequiredService<RezervacijaDogadjajService>();
+
+                await dogadjaji.PosaljiKreiranaAsync(
+                    rezervacijaId,
+                    ea.CancellationToken);
+            }
+            catch (Exception eventEx)
+            {
+                logger.LogError(
+                    eventEx,
+                    "Rezervacija {RezervacijaId} je sacuvana, ali dogadjaj nije objavljen.",
+                    rezervacijaId);
+            }
 
                 // Uspesna obrada
                 await AzurirajStatusAsync(
