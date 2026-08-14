@@ -6,6 +6,7 @@ using Salon.Domen.Entiteti;
 using Salon.Domen.Enumeracije;
 using Salon.Infrastruktura.Podaci;
 using Zajednicko.Poruke.Komande;
+using Salon.Infrastruktura.Servisi;
 
 namespace Salon.Api.Controllers;
 
@@ -15,13 +16,16 @@ public class RezervacijeController : ControllerBase
 {
     private readonly RabbitMqPublisherService _publisher;
     private readonly SalonKontekst _kontekst;
+    private readonly UpravljanjeRezervacijomService _upravljanje;
 
     public RezervacijeController(
         RabbitMqPublisherService publisher,
-        SalonKontekst kontekst)
+        SalonKontekst kontekst,
+        UpravljanjeRezervacijomService upravljanje)
     {
         _publisher = publisher;
         _kontekst = kontekst;
+        _upravljanje = upravljanje;
     }
 
     // Slanje zahteva za novu rezervaciju na asinhronu obradu
@@ -271,5 +275,24 @@ public class RezervacijeController : ControllerBase
             };
 
         return Ok(rezultat);
+    }
+
+    [HttpPost("{id:int}/otkazi")]
+    public async Task<IActionResult> Otkazi(
+        int id,
+        PristupRezervacijiDto zahtev,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _upravljanje.OtkaziAsync(
+                id, zahtev.Email, zahtev.Sifra, cancellationToken);
+
+            return Ok(new { Poruka = "Rezervacija je otkazana." });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
