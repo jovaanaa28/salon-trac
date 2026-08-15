@@ -120,11 +120,9 @@ public class Worker(
                 try
                 {
                     using var eventScope = scopeFactory.CreateScope();
-                    //var dogadjaji = eventScope.ServiceProvider
-                      //  .GetRequiredService<RezervacijaDogadjajService>();
+                    var dogadjaji = eventScope.ServiceProvider.GetRequiredService<RezervacijaDogadjajService>();
 
-                   // await dogadjaji.PosaljiKreiranaAsync(
-                   //     rezervacijaId, ea.CancellationToken);
+                    await dogadjaji.PosaljiKreiranaAsync(rezervacijaId, ea.CancellationToken);
                 }
                 catch (Exception eventEx)
                 {

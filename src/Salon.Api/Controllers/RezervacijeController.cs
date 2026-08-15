@@ -19,15 +19,21 @@ public class RezervacijeController : ControllerBase
     private readonly RabbitMqPublisherService _publisher;
     private readonly SalonKontekst _kontekst;
     private readonly UpravljanjeRezervacijomService _upravljanje;
+    private readonly RezervacijaDogadjajService _dogadjaji;
+    private readonly ILogger<RezervacijeController> _logger;
 
     public RezervacijeController(
         RabbitMqPublisherService publisher,
         SalonKontekst kontekst,
-        UpravljanjeRezervacijomService upravljanje)
+        UpravljanjeRezervacijomService upravljanje,
+        RezervacijaDogadjajService dogadjaji,
+        ILogger<RezervacijeController> logger)
     {
         _publisher = publisher;
         _kontekst = kontekst;
         _upravljanje = upravljanje;
+        _dogadjaji = dogadjaji;
+        _logger = logger;
     }
 
     // Slanje zahteva za novu rezervaciju na asinhronu obradu
@@ -290,6 +296,15 @@ public class RezervacijeController : ControllerBase
             await _upravljanje.DodajStavkuAsync(
                 id, zahtev.Email, zahtev.Sifra, zahtev.UslugaId,
                 zahtev.Datum, zahtev.VremePocetka, cancellationToken);
+            try
+            {
+                await _dogadjaji.PosaljiIzmenjenaAsync(
+                id, "DODATA_USLUGA", cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Rezervacija {RezervacijaId} je izmenjena, " + "ali dogadjaj nije objavljen.", id);
+            }
 
             return Ok(new { Poruka = "Usluga je dodata na rezervaciju." });
         }
@@ -310,9 +325,18 @@ public class RezervacijeController : ControllerBase
         {
             await _upravljanje.ObrisiStavkuAsync(
                 id, stavkaId, zahtev.Email, zahtev.Sifra, cancellationToken);
+            try 
+            { 
+                await _dogadjaji.PosaljiIzmenjenaAsync(
+                    id, "UKLONJENA_USLUGA", cancellationToken); 
+                    }
+                     catch (Exception ex)
+                    {
+                         _logger.LogError(ex,  "Rezervacija {RezervacijaId} je izmenjena, " +  "ali dogadjaj nije objavljen.", id);   
+                    }
 
             return Ok(new { Poruka = "Usluga je uklonjena iz rezervacije." });
-        }
+            }
         catch (ArgumentException ex)
         {
             return BadRequest(ex.Message);
