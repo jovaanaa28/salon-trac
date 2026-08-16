@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Salon.Infrastruktura.Podaci;
-using Salon.Infrastruktura.Servisi;
 using Zajednicko.Poruke.Dogadjaji;
 
+namespace Salon.Infrastruktura.Servisi;
 
 public class RezervacijaDogadjajService
 {
@@ -94,6 +94,76 @@ public class RezervacijaDogadjajService
             dogadjaj,
             "rezervacija.kreirana",
             cancellationToken);
+    }
+
+    public async Task PosaljiOtkazanaAsync(
+
+    int rezervacijaId,
+
+    CancellationToken cancellationToken)
+
+    {
+
+        var rezervacija = await _kontekst.Rezervacije
+
+            .AsNoTracking()
+
+            .FirstOrDefaultAsync(
+
+                r => r.Id == rezervacijaId,
+
+                cancellationToken);
+
+
+
+        if (rezervacija == null)
+
+        {
+
+            throw new InvalidOperationException(
+
+                "Rezervacija za dogadjaj nije pronadjena.");
+
+        }
+
+
+
+        if (!rezervacija.DatumOtkazivanja.HasValue)
+
+        {
+
+            throw new InvalidOperationException(
+
+                "Rezervacija nije otkazana.");
+
+        }
+
+
+
+        var dogadjaj = new RezervacijaOtkazanaDogadjaj
+
+        {
+
+            RezervacijaId = rezervacija.Id,
+
+            Email = rezervacija.Email,
+
+            Status = rezervacija.Status.ToString(),
+
+            DatumOtkazivanja = rezervacija.DatumOtkazivanja.Value
+
+        };
+
+
+
+        await _publisher.PosaljiAsync(
+
+            dogadjaj,
+
+            "rezervacija.otkazana",
+
+            cancellationToken);
+
     }
 
     private async Task<List<StavkaRezervacijeDogadjaj>> UcitajStavkeAsync(

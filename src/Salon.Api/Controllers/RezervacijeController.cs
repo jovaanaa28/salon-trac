@@ -325,18 +325,18 @@ public class RezervacijeController : ControllerBase
         {
             await _upravljanje.ObrisiStavkuAsync(
                 id, stavkaId, zahtev.Email, zahtev.Sifra, cancellationToken);
-            try 
-            { 
+            try
+            {
                 await _dogadjaji.PosaljiIzmenjenaAsync(
-                    id, "UKLONJENA_USLUGA", cancellationToken); 
-                    }
-                     catch (Exception ex)
-                    {
-                         _logger.LogError(ex,  "Rezervacija {RezervacijaId} je izmenjena, " +  "ali dogadjaj nije objavljen.", id);   
-                    }
+                    id, "UKLONJENA_USLUGA", cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Rezervacija {RezervacijaId} je izmenjena, " + "ali dogadjaj nije objavljen.", id);
+            }
 
             return Ok(new { Poruka = "Usluga je uklonjena iz rezervacije." });
-            }
+        }
         catch (ArgumentException ex)
         {
             return BadRequest(ex.Message);
@@ -346,22 +346,51 @@ public class RezervacijeController : ControllerBase
 
     [HttpPost("{id:int}/otkazi")]
     public async Task<IActionResult> Otkazi(
-        int id,
-        PristupRezervacijiDto zahtev,
-        CancellationToken cancellationToken)
+    int id,
+    PristupRezervacijiDto zahtev,
+    CancellationToken cancellationToken)
     {
         try
         {
             await _upravljanje.OtkaziAsync(
-                id, zahtev.Email, zahtev.Sifra, cancellationToken);
+                id,
+                zahtev.Email,
+                zahtev.Sifra,
+                cancellationToken);
 
-            return Ok(new { Poruka = "Rezervacija je otkazana." });
+            try
+
+            {
+
+                await _dogadjaji.PosaljiOtkazanaAsync(
+                    id,
+                    cancellationToken);
+            }
+
+            catch (Exception ex)
+
+            {
+
+                _logger.LogError(
+                    ex,
+                    "Rezervacija {RezervacijaId} je otkazana, " +
+                    "ali dogadjaj nije objavljen.",
+                    id);
+            }
+
+            return Ok(new
+            {
+                Poruka = "Rezervacija je otkazana."
+            });
+
         }
+
         catch (ArgumentException ex)
+
         {
             return BadRequest(ex.Message);
         }
+
     }
 }
-
 

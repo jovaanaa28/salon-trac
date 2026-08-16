@@ -1,3 +1,5 @@
+namespace Zajednicko.Poruke.Dogadjaji; 
+
 public class RezervacijaOtkazanaDogadjaj
 {
     public Guid DogadjajId { get; set; } = Guid.NewGuid();
