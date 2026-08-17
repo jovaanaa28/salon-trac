@@ -42,6 +42,15 @@ function AdminNavigacija() {
             Kategorije
           </NavLink>
 
+          <NavLink
+            to="/administracija/usluge"
+            className={({ isActive }) =>
+              klasaLinka(isActive)
+            }
+          >
+            Usluge
+          </NavLink>
+
           <Link
             to="/"
             className="admin-link"
