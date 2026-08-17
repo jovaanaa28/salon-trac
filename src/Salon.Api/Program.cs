@@ -5,6 +5,8 @@ using Salon.Infrastruktura.Servisi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string SalonFrontendCors = "SalonFrontendCors";
+
 // Ucitavanje konekcije ka bazi
 var connectionString = builder.Configuration.GetConnectionString("SalonBaza")
     ?? throw new InvalidOperationException(
@@ -27,6 +29,19 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 // Registracija kontrolera
 builder.Services.AddControllers();
+
+// CORS - dozvoljava React frontend aplikaciji
+// da pristupa Salon.Api backend-u
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(SalonFrontendCors, policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 // OpenAPI dokumentacija
 builder.Services.AddOpenApi();
@@ -65,6 +80,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// CORS za React frontend
+app.UseCors(SalonFrontendCors);
+
 app.UseAuthorization();
 
 // Povezivanje API ruta sa kontrolerima
