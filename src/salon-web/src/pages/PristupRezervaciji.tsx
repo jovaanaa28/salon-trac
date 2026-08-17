@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from "react";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 import Zaglavlje from "../components/Zaglavlje";
 import type { RezervacijaDetalji } from "../models/RezervacijaDetalji";
 import { pristupiRezervaciji } from "../services/rezervacijeService";
@@ -21,6 +21,7 @@ function formatirajVreme(vreme: string) {
 }
 
 function PristupRezervaciji() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [sifra, setSifra] = useState("");
   const [rezervacija, setRezervacija] = useState<RezervacijaDetalji | null>(
@@ -213,18 +214,14 @@ function PristupRezervaciji() {
               </div>
             )}
 
-            <div className="pristup-upravljanje">
-              <Link
-                to="/upravljanje-rezervacijom"
-                className="pristup-upravljanje-dugme"
-              >
-                Upravljaj rezervacijom
-              </Link>
-              <p>
-                Ovde možeš dodati ili ukloniti uslugu i otkazati rezervaciju.
-              </p>
-            </div>
-            
+            <button
+              type="button"
+              className="pristup-glavno-dugme"
+              onClick={() => navigate("/upravljanje-rezervacijom")}
+            >
+              Upravljaj rezervacijom
+            </button>
+
             <button
               type="button"
               className="pristup-sekundarno-dugme"

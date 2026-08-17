@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes} from "react-router";
 
 import AdminKategorije from "./pages/AdminKategorije";
 
