@@ -9,6 +9,7 @@ public class RezervacijaKreiranaDogadjaj
     public Guid DogadjajId { get; set; } = Guid.NewGuid();
     public int RezervacijaId { get; set; }
     public DateTime VremeDogadjaja { get; set; } = DateTime.UtcNow;
+    public DateTime DatumKreiranja { get; set; }
     public string Email { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string IzabranaValuta { get; set; } = string.Empty;
