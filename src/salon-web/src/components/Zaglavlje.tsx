@@ -1,14 +1,28 @@
+import { Link } from 'react-router'
+
 function Zaglavlje() {
   return (
     <header className="zaglavlje">
       <div className="zaglavlje-sadrzaj">
-        <a className="logo" href="/">
+        <Link
+          className="logo"
+          to="/"
+        >
           Salon Trač
-        </a>
+        </Link>
 
         <nav className="navigacija">
-          <a href="#o-salonu">O salonu</a>
-          <a href="#usluge">Usluge</a>
+          <a href="#o-salonu">
+            O salonu
+          </a>
+
+          <a href="#usluge">
+            Usluge
+          </a>
+
+          <Link to="/administracija/osnovne-informacije">
+            Administracija
+          </Link>
         </nav>
       </div>
     </header>

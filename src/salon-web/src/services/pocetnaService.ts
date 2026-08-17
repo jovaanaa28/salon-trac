@@ -1,13 +1,10 @@
-import type { OsnovneInformacije } from '../models/OsnovneInformacije'
 import type { KategorijaUsluge } from '../models/KategorijaUsluge'
 import type { Usluga } from '../models/Usluga'
 import { apiRequest } from './api'
 
-export function getOsnovneInformacije() {
-  return apiRequest<OsnovneInformacije>(
-    '/api/osnovne-informacije',
-  )
-}
+export {
+  getOsnovneInformacije,
+} from './osnovneInformacijeService'
 
 export function getKategorijeUsluga() {
   return apiRequest<KategorijaUsluge[]>(

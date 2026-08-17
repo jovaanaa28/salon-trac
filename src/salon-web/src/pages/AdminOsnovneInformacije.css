@@ -1,0 +1,154 @@
+.admin-stranica {
+  min-height: 100vh;
+  background: #f8f3f2;
+}
+
+.admin-glavni-sadrzaj {
+  width: min(850px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 64px 0 90px;
+}
+
+.admin-naslov {
+  margin-bottom: 32px;
+}
+
+.admin-nadnaslov {
+  margin: 0 0 10px;
+  color: #9a626f;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-naslov h1 {
+  margin: 0 0 12px;
+  color: #35282c;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.admin-naslov > p:last-child {
+  margin: 0;
+  color: #74666a;
+  line-height: 1.7;
+}
+
+.admin-forma {
+  padding: 32px;
+  background: white;
+  border: 1px solid #e8dddd;
+  border-radius: 18px;
+  box-shadow:
+    0 10px 30px rgba(63, 43, 49, 0.06);
+}
+
+.admin-polje {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.admin-polje label {
+  color: #47383c;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.admin-polje input,
+.admin-polje textarea {
+  width: 100%;
+  padding: 13px 14px;
+  color: #3c2e32;
+  background: #fffdfc;
+  border: 1px solid #d8caca;
+  border-radius: 9px;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.admin-polje textarea {
+  resize: vertical;
+  min-height: 130px;
+}
+
+.admin-polje input:focus,
+.admin-polje textarea:focus {
+  border-color: #9a626f;
+  box-shadow:
+    0 0 0 3px rgba(154, 98, 111, 0.12);
+}
+
+.admin-poruka {
+  margin: 20px 0;
+  padding: 13px 15px;
+  border-radius: 9px;
+  line-height: 1.5;
+}
+
+.admin-greska {
+  color: #8a2525;
+  background: #fff0f0;
+  border: 1px solid #edcaca;
+}
+
+.admin-uspeh {
+  color: #34633f;
+  background: #eff9f1;
+  border: 1px solid #c9e4cf;
+}
+
+.admin-akcije {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 28px;
+}
+
+.admin-dugme {
+  padding: 13px 22px;
+  color: white;
+  background: #80535e;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.admin-dugme:hover:not(:disabled) {
+  background: #68424c;
+}
+
+.admin-dugme:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.admin-status {
+  padding: 35px;
+  background: white;
+  border: 1px solid #e8dddd;
+  border-radius: 16px;
+  color: #74666a;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .admin-glavni-sadrzaj {
+    padding: 40px 0 64px;
+  }
+
+  .admin-forma {
+    padding: 22px;
+  }
+
+  .admin-akcije {
+    display: block;
+  }
+
+  .admin-dugme {
+    width: 100%;
+  }
+}
