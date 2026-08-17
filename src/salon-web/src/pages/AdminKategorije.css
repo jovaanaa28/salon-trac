@@ -1,0 +1,284 @@
+.admin-kategorije-stranica {
+  min-height: 100vh;
+  background: #f8f3f2;
+}
+
+.admin-kategorije-sadrzaj {
+  width: min(900px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 64px 0 90px;
+}
+
+.admin-kategorije-naslov {
+  margin-bottom: 32px;
+}
+
+.admin-kategorije-nadnaslov {
+  margin: 0 0 10px;
+  color: #9a626f;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-kategorije-naslov h1 {
+  margin: 0 0 12px;
+  color: #35282c;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.admin-kategorije-naslov > p:last-child {
+  max-width: 650px;
+  margin: 0;
+  color: #74666a;
+  line-height: 1.7;
+}
+
+.dodavanje-kategorije,
+.lista-kategorija-sekcija {
+  padding: 28px;
+  background: white;
+  border: 1px solid #e8dddd;
+  border-radius: 18px;
+  box-shadow:
+    0 10px 30px rgba(63, 43, 49, 0.05);
+}
+
+.dodavanje-kategorije {
+  margin-bottom: 24px;
+}
+
+.dodavanje-kategorije h2,
+.lista-kategorija-zaglavlje h2 {
+  margin: 0;
+  color: #3c2e32;
+  font-size: 1.3rem;
+}
+
+.kategorija-forma {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.kategorija-polje {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kategorija-polje label {
+  color: #47383c;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.kategorija-polje input,
+.izmena-kategorije-forma input {
+  width: 100%;
+  padding: 13px 14px;
+  color: #3c2e32;
+  background: #fffdfc;
+  border: 1px solid #d8caca;
+  border-radius: 9px;
+  outline: none;
+}
+
+.kategorija-polje input:focus,
+.izmena-kategorije-forma input:focus {
+  border-color: #9a626f;
+  box-shadow:
+    0 0 0 3px rgba(154, 98, 111, 0.12);
+}
+
+.kategorija-dugme {
+  min-height: 47px;
+  padding: 0 20px;
+  color: white;
+  background: #80535e;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.kategorija-dugme:hover:not(:disabled) {
+  background: #68424c;
+}
+
+.kategorija-dugme:disabled,
+.kategorija-malo-dugme:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.kategorije-poruka {
+  margin: 20px 0;
+  padding: 13px 15px;
+  border-radius: 9px;
+  line-height: 1.5;
+}
+
+.kategorije-greska {
+  color: #8a2525;
+  background: #fff0f0;
+  border: 1px solid #edcaca;
+}
+
+.kategorije-uspeh {
+  color: #34633f;
+  background: #eff9f1;
+  border: 1px solid #c9e4cf;
+}
+
+.lista-kategorija-zaglavlje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.lista-kategorija-zaglavlje span {
+  color: #89777c;
+  font-size: 0.9rem;
+}
+
+.lista-kategorija {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kategorija-red {
+  min-height: 72px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #fffdfc;
+  border: 1px solid #eadede;
+  border-radius: 12px;
+}
+
+.kategorija-podaci {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kategorija-podaci strong {
+  color: #3c2e32;
+  font-size: 1rem;
+}
+
+.kategorija-id {
+  color: #a08d92;
+  font-size: 0.82rem;
+}
+
+.kategorija-akcije {
+  display: flex;
+  gap: 8px;
+}
+
+.kategorija-malo-dugme {
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.kategorija-izmeni,
+.kategorija-odustani {
+  color: #68424c;
+  background: white;
+  border: 1px solid #cdbabd;
+}
+
+.kategorija-izmeni:hover,
+.kategorija-odustani:hover {
+  background: #f5ebec;
+}
+
+.kategorija-sacuvaj {
+  color: white;
+  background: #80535e;
+  border: 1px solid #80535e;
+}
+
+.kategorija-sacuvaj:hover {
+  background: #68424c;
+}
+
+.kategorija-obrisi {
+  color: #922f2f;
+  background: #fff5f5;
+  border: 1px solid #e8caca;
+}
+
+.kategorija-obrisi:hover:not(:disabled) {
+  background: #ffe9e9;
+}
+
+.izmena-kategorije-forma {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.izmena-kategorije-forma input {
+  flex: 1;
+}
+
+.kategorije-status {
+  padding: 28px;
+  color: #7c6b70;
+  background: #fffdfc;
+  border: 1px dashed #ddcecf;
+  border-radius: 10px;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .admin-kategorije-sadrzaj {
+    padding: 40px 0 64px;
+  }
+
+  .dodavanje-kategorije,
+  .lista-kategorija-sekcija {
+    padding: 20px;
+  }
+
+  .kategorija-forma {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .kategorija-dugme {
+    width: 100%;
+  }
+
+  .kategorija-red {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .kategorija-akcije {
+    width: 100%;
+  }
+
+  .kategorija-akcije button {
+    flex: 1;
+  }
+
+  .izmena-kategorije-forma {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

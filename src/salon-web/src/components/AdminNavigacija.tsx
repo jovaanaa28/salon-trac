@@ -1,7 +1,18 @@
-import { Link } from 'react-router'
+import {
+  Link,
+  NavLink,
+} from 'react-router'
 import './AdminNavigacija.css'
 
 function AdminNavigacija() {
+  function klasaLinka(
+    isActive: boolean,
+  ) {
+    return isActive
+      ? 'admin-link admin-link-aktivan'
+      : 'admin-link'
+  }
+
   return (
     <header className="admin-zaglavlje">
       <div className="admin-zaglavlje-sadrzaj">
@@ -13,12 +24,23 @@ function AdminNavigacija() {
         </Link>
 
         <nav className="admin-navigacija">
-          <Link
+          <NavLink
             to="/administracija/osnovne-informacije"
-            className="admin-link admin-link-aktivan"
+            className={({ isActive }) =>
+              klasaLinka(isActive)
+            }
           >
             Osnovne informacije
-          </Link>
+          </NavLink>
+
+          <NavLink
+            to="/administracija/kategorije"
+            className={({ isActive }) =>
+              klasaLinka(isActive)
+            }
+          >
+            Kategorije
+          </NavLink>
 
           <Link
             to="/"

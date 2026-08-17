@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router'
+import AdminKategorije from './pages/AdminKategorije'
 import AdminOsnovneInformacije from './pages/AdminOsnovneInformacije'
 import PocetnaStranica from './pages/PocetnaStranica'
 import './App.css'
@@ -14,6 +15,11 @@ function App() {
       <Route
         path="/administracija/osnovne-informacije"
         element={<AdminOsnovneInformacije />}
+      />
+
+      <Route
+        path="/administracija/kategorije"
+        element={<AdminKategorije />}
       />
     </Routes>
   )
