@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router'
 import AdminKategorije from './pages/AdminKategorije'
 import AdminOsnovneInformacije from './pages/AdminOsnovneInformacije'
+import AdminPodesavanja from './pages/AdminPodesavanja'
 import AdminUsluge from './pages/AdminUsluge'
 import PocetnaStranica from './pages/PocetnaStranica'
 import './App.css'
@@ -26,6 +27,11 @@ function App() {
       <Route
         path="/administracija/usluge"
         element={<AdminUsluge />}
+      />
+
+      <Route
+        path="/administracija/podesavanja"
+        element={<AdminPodesavanja />}
       />
     </Routes>
   )

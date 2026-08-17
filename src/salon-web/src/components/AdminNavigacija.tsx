@@ -51,6 +51,15 @@ function AdminNavigacija() {
             Usluge
           </NavLink>
 
+          <NavLink
+            to="/administracija/podesavanja"
+            className={({ isActive }) =>
+              klasaLinka(isActive)
+            }
+          >
+            Valute i popust
+          </NavLink>
+
           <Link
             to="/"
             className="admin-link"
