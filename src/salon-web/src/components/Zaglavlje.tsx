@@ -1,32 +1,25 @@
-import { Link } from 'react-router'
+import { Link } from "react-router";
 
 function Zaglavlje() {
   return (
     <header className="zaglavlje">
       <div className="zaglavlje-sadrzaj">
-        <Link
-          className="logo"
-          to="/"
-        >
+        <Link className="logo" to="/">
           Salon Trač
         </Link>
 
         <nav className="navigacija">
-          <a href="#o-salonu">
-            O salonu
-          </a>
+          <a href="/#o-salonu">O salonu</a>
 
-          <a href="#usluge">
-            Usluge
-          </a>
+          <a href="/#usluge">Usluge</a>
 
-          <Link to="/administracija/osnovne-informacije">
-            Administracija
-          </Link>
+          <Link to="/rezervacija">Rezerviši</Link>
+
+          <Link to="/administracija/osnovne-informacije">Administracija</Link>
         </nav>
       </div>
     </header>
-  )
+  );
 }
 
-export default Zaglavlje
+export default Zaglavlje;

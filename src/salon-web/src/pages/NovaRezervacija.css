@@ -1,0 +1,426 @@
+.rezervacija-stranica {
+  min-height: 100vh;
+
+  background: #f8f3f2;
+}
+
+.rezervacija-sadrzaj {
+  width: min(1000px, calc(100% - 40px));
+
+  margin: 0 auto;
+
+  padding: 64px 0 90px;
+}
+
+.rezervacija-naslov {
+  margin-bottom: 32px;
+}
+
+.rezervacija-nadnaslov {
+  margin: 0 0 10px;
+
+  color: #9a626f;
+
+  font-size: 0.85rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.rezervacija-naslov h1 {
+  margin: 0 0 12px;
+
+  color: #35282c;
+
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+
+.rezervacija-naslov > p:last-child {
+  max-width: 680px;
+
+  margin: 0;
+
+  color: #74666a;
+
+  line-height: 1.7;
+}
+
+.rezervacija-kartica {
+  margin-bottom: 24px;
+
+  padding: 30px;
+
+  background: white;
+
+  border: 1px solid #e8dddd;
+
+  border-radius: 18px;
+
+  box-shadow: 0 10px 30px rgba(63, 43, 49, 0.05);
+}
+
+.rezervacija-sekcija-zaglavlje {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+.rezervacija-korak {
+  display: inline-block;
+
+  margin-bottom: 6px;
+
+  color: #9a626f;
+
+  font-size: 0.78rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.rezervacija-sekcija-zaglavlje h2 {
+  margin: 0;
+
+  color: #3c2e32;
+
+  font-size: 1.4rem;
+}
+
+.rezervacija-stavke {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.rezervacija-stavka {
+  padding: 20px;
+
+  background: #fffdfc;
+
+  border: 1px solid #eadede;
+
+  border-radius: 13px;
+}
+
+.rezervacija-stavka-vrh {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 18px;
+}
+
+.rezervacija-stavka-vrh strong {
+  color: #493a3e;
+}
+
+.rezervacija-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.rezervacija-polje {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.rezervacija-polje-puno {
+  grid-column: 1 / -1;
+}
+
+.rezervacija-polje label {
+  color: #47383c;
+
+  font-size: 0.9rem;
+
+  font-weight: 700;
+}
+
+.rezervacija-polje input,
+.rezervacija-polje select {
+  width: 100%;
+
+  min-height: 47px;
+
+  padding: 11px 13px;
+
+  color: #3c2e32;
+
+  background: #fffdfc;
+
+  border: 1px solid #d8caca;
+
+  border-radius: 9px;
+
+  outline: none;
+}
+
+.rezervacija-polje input:focus,
+.rezervacija-polje select:focus {
+  border-color: #9a626f;
+
+  box-shadow: 0 0 0 3px rgba(154, 98, 111, 0.12);
+}
+
+.rezervacija-polje select:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.65;
+}
+
+.rezervacija-sekundarno-dugme {
+  padding: 10px 14px;
+
+  color: #68424c;
+
+  background: white;
+
+  border: 1px solid #cdbabd;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+}
+
+.rezervacija-sekundarno-dugme:hover:not(:disabled) {
+  background: #f5ebec;
+}
+
+.rezervacija-ukloni-dugme {
+  padding: 6px 10px;
+
+  color: #922f2f;
+
+  background: transparent;
+
+  border: 0;
+
+  cursor: pointer;
+
+  font-weight: 700;
+}
+
+.rezervacija-ukloni-dugme:hover {
+  text-decoration: underline;
+}
+
+.rezervacija-napomena {
+  color: #927f84;
+
+  font-size: 0.82rem;
+
+  line-height: 1.4;
+}
+
+.rezervacija-napomena-greska {
+  color: #9a3131;
+
+  font-size: 0.84rem;
+
+  line-height: 1.4;
+}
+
+.rezervacija-poruka {
+  margin-bottom: 24px;
+
+  padding: 15px 17px;
+
+  border-radius: 10px;
+
+  line-height: 1.55;
+}
+
+.rezervacija-greska {
+  color: #8a2525;
+
+  background: #fff0f0;
+
+  border: 1px solid #edcaca;
+}
+
+.rezervacija-prihvacena {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+
+  color: #34633f;
+
+  background: #eff9f1;
+
+  border: 1px solid #c9e4cf;
+}
+
+.rezervacija-prihvacena p {
+  margin: 5px 0 0;
+}
+
+.rezervacija-status {
+  padding: 40px;
+
+  color: #7c6b70;
+
+  background: white;
+
+  border: 1px solid #e8dddd;
+
+  border-radius: 16px;
+
+  text-align: center;
+}
+
+.rezervacija-pregled {
+  margin-bottom: 0;
+}
+
+.rezervacija-cena-red {
+  padding: 12px 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid #f0e7e7;
+}
+
+.rezervacija-cena-red span {
+  color: #75666a;
+}
+
+.rezervacija-cena-red strong {
+  color: #45363a;
+}
+
+.rezervacija-konacna-cena {
+  margin-top: 6px;
+
+  padding-top: 18px;
+
+  font-size: 1.08rem;
+}
+
+.rezervacija-konacna-cena strong {
+  color: #80535e;
+
+  font-size: 1.2rem;
+}
+
+.rezervacija-valuta-cena {
+  border-bottom: 0;
+}
+
+.rezervacija-valuta-cena strong {
+  color: #80535e;
+}
+
+.rezervacija-submit {
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 26px;
+}
+
+.rezervacija-glavno-dugme {
+  min-width: 220px;
+
+  padding: 14px 24px;
+
+  color: white;
+
+  background: #80535e;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  cursor: pointer;
+
+  font-weight: 800;
+}
+
+.rezervacija-glavno-dugme:hover:not(:disabled) {
+  background: #68424c;
+}
+
+.rezervacija-glavno-dugme:disabled,
+.rezervacija-sekundarno-dugme:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+}
+
+@media (max-width: 700px) {
+  .rezervacija-sadrzaj {
+    padding: 40px 0 64px;
+  }
+
+  .rezervacija-kartica {
+    padding: 20px;
+  }
+
+  .rezervacija-sekcija-zaglavlje {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .rezervacija-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rezervacija-polje-puno {
+    grid-column: auto;
+  }
+
+  .rezervacija-sekundarno-dugme {
+    width: 100%;
+  }
+
+  .rezervacija-submit {
+    display: block;
+  }
+
+  .rezervacija-glavno-dugme {
+    width: 100%;
+  }
+
+  .rezervacija-cena-red {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 5px;
+  }
+}
