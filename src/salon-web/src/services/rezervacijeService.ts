@@ -1,33 +1,26 @@
-import type { 
+import type {
+  KreiranjeRezervacijeOdgovor,
+  NovaRezervacijaZahtev,
+} from "../models/NovaRezervacija";
 
-  KreiranjeRezervacijeOdgovor, 
+import type { StatusRezervacije } from "../models/StatusRezervacije";
 
-  NovaRezervacijaZahtev, 
+import { apiRequest } from "./api";
 
-} from '../models/NovaRezervacija' 
+export function kreirajRezervaciju(zahtev: NovaRezervacijaZahtev) {
+  return apiRequest<KreiranjeRezervacijeOdgovor>(
+    "/api/rezervacije",
 
-import { apiRequest } from './api' 
+    {
+      method: "POST",
 
- 
+      body: JSON.stringify(zahtev),
+    },
+  );
+}
 
-export function kreirajRezervaciju( 
-
-  zahtev: NovaRezervacijaZahtev, 
-
-) { 
-
-  return apiRequest<KreiranjeRezervacijeOdgovor>( 
-
-    '/api/rezervacije', 
-
-    { 
-
-      method: 'POST', 
-
-      body: JSON.stringify(zahtev), 
-
-    }, 
-
-  ) 
-
+export function getStatusRezervacije(idZahteva: string) {
+  return apiRequest<StatusRezervacije>(
+    `/api/rezervacije/status/${encodeURIComponent(idZahteva)}`,
+  );
 }

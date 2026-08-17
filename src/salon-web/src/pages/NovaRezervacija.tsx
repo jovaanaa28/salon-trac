@@ -12,10 +12,7 @@ import type { DozvoljenaValuta } from "../models/DozvoljenaValuta";
 
 import type { Kurs } from "../models/Kurs";
 
-import type {
-  KreiranjeRezervacijeOdgovor,
-  NovaRezervacijaZahtev,
-} from "../models/NovaRezervacija";
+import type { NovaRezervacijaZahtev } from "../models/NovaRezervacija";
 
 import type { ObracunCeneOdgovor } from "../models/ObracunCene";
 
@@ -36,6 +33,8 @@ import { getUsluge } from "../services/uslugeService";
 import { getValute } from "../services/valuteService";
 
 import "./NovaRezervacija.css";
+
+import { useNavigate } from "react-router";
 
 interface PodaciKorisnika {
   ime: string;
@@ -130,6 +129,8 @@ function formatirajCenu(cena: number) {
 }
 
 function NovaRezervacija() {
+  const navigate = useNavigate();
+
   const sledeciKljuc = useRef(2);
 
   const [usluge, setUsluge] = useState<Usluga[]>([]);
@@ -149,9 +150,6 @@ function NovaRezervacija() {
   const [kurs, setKurs] = useState<Kurs | null>(null);
 
   const [obracun, setObracun] = useState<ObracunCeneOdgovor | null>(null);
-
-  const [prihvacenZahtev, setPrihvacenZahtev] =
-    useState<KreiranjeRezervacijeOdgovor | null>(null);
 
   const [ucitavanjePodataka, setUcitavanjePodataka] = useState(true);
 
@@ -359,8 +357,6 @@ function NovaRezervacija() {
 
     setObracun(null);
 
-    setPrihvacenZahtev(null);
-
     setGreska(null);
 
     if (uslugaId && datum) {
@@ -399,8 +395,6 @@ function NovaRezervacija() {
       ),
     );
 
-    setPrihvacenZahtev(null);
-
     setGreska(null);
 
     if (uslugaId && datum) {
@@ -431,8 +425,6 @@ function NovaRezervacija() {
       ),
     );
 
-    setPrihvacenZahtev(null);
-
     setGreska(null);
   }
 
@@ -444,8 +436,6 @@ function NovaRezervacija() {
     setStavke((prethodne) => [...prethodne, napraviPraznuStavku(noviKljuc)]);
 
     setObracun(null);
-
-    setPrihvacenZahtev(null);
   }
 
   function ukloniStavku(kljuc: number) {
@@ -459,8 +449,6 @@ function NovaRezervacija() {
 
     setObracun(null);
 
-    setPrihvacenZahtev(null);
-
     setGreska(null);
   }
 
@@ -470,8 +458,6 @@ function NovaRezervacija() {
     setKurs(null);
 
     setGreska(null);
-
-    setPrihvacenZahtev(null);
 
     if (!novaValuta) {
       return;
@@ -496,8 +482,6 @@ function NovaRezervacija() {
 
   async function proveriObracun() {
     setGreska(null);
-
-    setPrihvacenZahtev(null);
 
     if (ukupnaCenaRsd <= 0) {
       setGreska("Izaberi najmanje jednu uslugu.");
@@ -617,8 +601,6 @@ function NovaRezervacija() {
 
     setGreska(null);
 
-    setPrihvacenZahtev(null);
-
     const porukaValidacije = validirajFormu();
 
     if (porukaValidacije) {
@@ -679,14 +661,7 @@ function NovaRezervacija() {
       };
 
       const odgovor = await kreirajRezervaciju(zahtev);
-
-      setPrihvacenZahtev(odgovor);
-
-      window.scrollTo({
-        top: 0,
-
-        behavior: "smooth",
-      });
+      navigate(`/rezervacija/status/${odgovor.idZahteva}`);
     } catch (error) {
       if (error instanceof Error) {
         setGreska(error.message);
@@ -720,21 +695,6 @@ function NovaRezervacija() {
 
         {greska && (
           <div className="rezervacija-poruka rezervacija-greska">{greska}</div>
-        )}
-
-        {prihvacenZahtev && (
-          <div className="rezervacija-poruka rezervacija-prihvacena">
-            <strong>Zahtev je uspešno poslat na obradu.</strong>
-
-            <span>Status: {prihvacenZahtev.status}</span>
-
-            <span>ID zahteva: {prihvacenZahtev.idZahteva}</span>
-
-            <p>
-              Rezervacija se obrađuje. Konačan rezultat biće prikazan nakon
-              provere statusa zahteva.
-            </p>
-          </div>
         )}
 
         {ucitavanjePodataka ? (
@@ -1031,8 +991,6 @@ function NovaRezervacija() {
 
                       setObracun(null);
 
-                      setPrihvacenZahtev(null);
-
                       setGreska(null);
                     }}
                     placeholder="Opciono"
@@ -1117,14 +1075,11 @@ function NovaRezervacija() {
                 <button
                   type="submit"
                   className="rezervacija-glavno-dugme"
-                  disabled={slanje || !!prihvacenZahtev}
+                  disabled={slanje}
                 >
-                  {slanje
-                    ? "Slanje zahteva..."
-                    : prihvacenZahtev
-                      ? "Zahtev je poslat"
-                      : "Pošalji rezervaciju"}
+                  {slanje ? "Slanje zahteva..." : "Pošalji rezervaciju"}
                 </button>
+                
               </div>
             </section>
           </form>

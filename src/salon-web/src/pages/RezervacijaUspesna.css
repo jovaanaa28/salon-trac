@@ -1,0 +1,269 @@
+.rezultat-rezervacije-stranica {
+ min-height: 100vh;
+ background: #f8f3f2;
+}
+.rezultat-rezervacije-sadrzaj {
+ width: min(760px, calc(100% - 40px));
+ margin: 0 auto;
+ padding: 72px 0 100px;
+}
+.rezultat-kartica {
+ padding: 42px;
+ background: white;
+ border: 1px solid #e8dddd;
+ border-radius: 20px;
+ box-shadow:
+   0 14px 40px rgba(63, 43, 49, 0.07);
+ text-align: center;
+}
+.rezultat-ikona {
+ width: 64px;
+ height: 64px;
+ margin: 0 auto 22px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ color: #932f2f;
+ background: #fff0f0;
+ border-radius: 50%;
+ font-size: 2rem;
+ font-weight: 800;
+}
+.rezultat-ikona-uspeh {
+ color: #347044;
+ background: #eaf7ed;
+}
+.rezultat-nadnaslov {
+ margin: 0 0 9px;
+ color: #9a626f;
+ font-size: 0.8rem;
+ font-weight: 800;
+ letter-spacing: 0.1em;
+ text-transform: uppercase;
+}
+.rezultat-kartica h1 {
+ margin: 0 0 16px;
+ color: #35282c;
+ font-size: clamp(
+   1.9rem,
+   5vw,
+   2.8rem
+ );
+}
+.rezultat-opis {
+ max-width: 590px;
+ margin: 0 auto;
+ color: #74666a;
+ line-height: 1.7;
+}
+.rezultat-podaci {
+ margin-top: 34px;
+ display: grid;
+ gap: 16px;
+ text-align: left;
+}
+.rezultat-podatak {
+ padding: 20px;
+ background: #fffaf9;
+ border: 1px solid #e7dada;
+ border-radius: 13px;
+}
+.rezultat-podatak > span {
+ display: block;
+ margin-bottom: 8px;
+ color: #8b767c;
+ font-size: 0.78rem;
+ font-weight: 800;
+ letter-spacing: 0.06em;
+ text-transform: uppercase;
+}
+.rezultat-vrednost-red {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 15px;
+}
+.rezultat-kod {
+ color: #6d4651;
+ font-size: 1.35rem;
+ letter-spacing: 0.08em;
+ overflow-wrap: anywhere;
+}
+.rezultat-kopiraj {
+ flex-shrink: 0;
+ padding: 8px 12px;
+ color: #68424c;
+ background: white;
+ border: 1px solid #cdbabd;
+ border-radius: 8px;
+ cursor: pointer;
+ font-weight: 700;
+}
+.rezultat-kopiraj:hover {
+ background: #f5ebec;
+}
+.rezultat-podatak small {
+ display: block;
+ margin-top: 9px;
+ color: #8d7a80;
+ line-height: 1.5;
+}
+.rezultat-informacije {
+ margin-top: 18px;
+ display: grid;
+ grid-template-columns:
+   repeat(2, minmax(0, 1fr));
+ gap: 12px;
+}
+.rezultat-informacije div {
+ padding: 16px;
+ background: #f8f3f2;
+ border-radius: 10px;
+ text-align: left;
+}
+.rezultat-informacije span,
+.rezultat-informacije strong {
+ display: block;
+}
+.rezultat-informacije span {
+ margin-bottom: 4px;
+ color: #927f84;
+ font-size: 0.75rem;
+ font-weight: 700;
+ text-transform: uppercase;
+}
+.rezultat-informacije strong {
+ color: #493a3e;
+}
+.rezultat-upozorenje {
+ margin-top: 22px;
+ padding: 16px 18px;
+ color: #6d5345;
+ background: #fff8e9;
+ border: 1px solid #ead8ad;
+ border-radius: 10px;
+ text-align: left;
+}
+.rezultat-upozorenje p {
+ margin: 5px 0 0;
+ line-height: 1.55;
+}
+.rezultat-akcije {
+ display: flex;
+ justify-content: center;
+ gap: 10px;
+ margin-top: 30px;
+}
+.rezultat-glavno-dugme,
+.rezultat-sekundarno-dugme {
+ padding: 12px 19px;
+ border-radius: 9px;
+ cursor: pointer;
+ font-weight: 750;
+}
+.rezultat-glavno-dugme {
+ color: white;
+ background: #80535e;
+ border: 1px solid #80535e;
+}
+.rezultat-glavno-dugme:hover {
+ background: #68424c;
+}
+.rezultat-sekundarno-dugme {
+ color: #68424c;
+ background: white;
+ border: 1px solid #cdbabd;
+}
+.rezultat-sekundarno-dugme:hover {
+ background: #f5ebec;
+}
+.rezultat-link-dugme {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ text-decoration: none;
+}
+.rezultat-spinner {
+ width: 55px;
+ height: 55px;
+ margin: 0 auto 24px;
+ border: 5px solid #eadfe1;
+ border-top-color: #80535e;
+ border-radius: 50%;
+ animation:
+   rezultat-okretanje 0.8s linear infinite;
+}
+@keyframes rezultat-okretanje {
+ to {
+   transform: rotate(360deg);
+ }
+}
+.rezultat-status-box {
+ width: fit-content;
+ margin: 28px auto 0;
+ padding: 13px 22px;
+ background: #f8f3f2;
+ border-radius: 10px;
+}
+.rezultat-status-box span,
+.rezultat-status-box strong {
+ display: block;
+}
+.rezultat-status-box span {
+ margin-bottom: 4px;
+ color: #8c797e;
+ font-size: 0.75rem;
+ font-weight: 700;
+ text-transform: uppercase;
+}
+.rezultat-status-box strong {
+ color: #68424c;
+}
+.rezultat-id-zahteva {
+ margin-top: 24px;
+}
+.rezultat-id-zahteva span {
+ display: block;
+ margin-bottom: 7px;
+ color: #927f84;
+ font-size: 0.78rem;
+ font-weight: 700;
+ text-transform: uppercase;
+}
+.rezultat-id-zahteva code {
+ display: inline-block;
+ max-width: 100%;
+ padding: 8px 10px;
+ color: #5e4a50;
+ background: #f4eeee;
+ border-radius: 7px;
+ overflow-wrap: anywhere;
+}
+.rezultat-cekanje-kartica
+.rezultat-glavno-dugme {
+ margin-top: 24px;
+}
+@media (max-width: 600px) {
+ .rezultat-rezervacije-sadrzaj {
+   padding: 42px 0 70px;
+ }
+ .rezultat-kartica {
+   padding: 26px 20px;
+ }
+ .rezultat-vrednost-red {
+   align-items: stretch;
+   flex-direction: column;
+ }
+ .rezultat-kopiraj {
+   width: 100%;
+ }
+ .rezultat-informacije {
+   grid-template-columns: 1fr;
+ }
+ .rezultat-akcije {
+   flex-direction: column;
+ }
+ .rezultat-akcije a {
+   width: 100%;
+ }
+}
