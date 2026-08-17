@@ -1,0 +1,269 @@
+.pocetna-stranica {
+  min-height: 100vh;
+}
+
+.zaglavlje {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid #eadede;
+}
+
+.zaglavlje-sadrzaj {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.logo {
+  color: #402f34;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.navigacija {
+  display: flex;
+  gap: 24px;
+}
+
+.navigacija a {
+  color: #5e4b50;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.navigacija a:hover {
+  color: #9a626f;
+}
+
+.hero-sekcija {
+  background:
+    linear-gradient(
+      135deg,
+      #fff8f7 0%,
+      #f5e7e5 100%
+    );
+  padding: 96px 20px;
+}
+
+.hero-sadrzaj {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.nadnaslov {
+  margin: 0 0 12px;
+  color: #9a626f;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero-sadrzaj h1 {
+  margin: 0;
+  color: #35282c;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: 1;
+}
+
+.opis-salona {
+  max-width: 700px;
+  margin: 28px auto;
+  color: #65575b;
+  font-size: 1.15rem;
+  line-height: 1.8;
+}
+
+.informacije-salona {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin: 32px 0;
+}
+
+.informacije-salona div {
+  min-width: 220px;
+  padding: 18px 22px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #eadede;
+  border-radius: 14px;
+}
+
+.informacije-salona span,
+.informacije-salona strong {
+  display: block;
+}
+
+.informacije-salona span {
+  margin-bottom: 6px;
+  color: #9a7d84;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.informacije-salona strong {
+  color: #46373b;
+}
+
+.glavno-dugme {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 14px 26px;
+  background: #80535e;
+  color: white;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.glavno-dugme:hover {
+  background: #68424c;
+}
+
+.usluge-sekcija {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 88px 0;
+}
+
+.naslov-sekcije {
+  max-width: 650px;
+  margin-bottom: 48px;
+}
+
+.naslov-sekcije h2 {
+  margin: 0 0 14px;
+  color: #35282c;
+  font-size: 2.4rem;
+}
+
+.naslov-sekcije > p:last-child {
+  color: #74666a;
+  line-height: 1.7;
+}
+
+.kategorije {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.kategorija h3 {
+  margin: 0 0 22px;
+  padding-bottom: 12px;
+  color: #46373b;
+  font-size: 1.65rem;
+  border-bottom: 1px solid #e5d9d9;
+}
+
+.usluge-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.usluga-kartica {
+  padding: 24px;
+  background: white;
+  border: 1px solid #eadede;
+  border-radius: 16px;
+  box-shadow:
+    0 8px 24px rgba(63, 43, 49, 0.06);
+}
+
+.usluga-vrh {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.usluga-vrh h4 {
+  margin: 0;
+  color: #3c2e32;
+  font-size: 1.2rem;
+}
+
+.cena {
+  flex-shrink: 0;
+  color: #80535e;
+  font-weight: 800;
+}
+
+.opis-usluge {
+  margin: 16px 0 24px;
+  color: #74666a;
+  line-height: 1.65;
+}
+
+.detalji-usluge {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #5f5155;
+  font-size: 0.9rem;
+}
+
+.prazna-lista {
+  color: #87777b;
+  font-style: italic;
+}
+
+.status-stranica {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  padding: 30px;
+  text-align: center;
+}
+
+.greska {
+  max-width: 600px;
+  color: #9c3030;
+}
+
+.podnozje {
+  padding: 30px 20px;
+  background: #3c2e32;
+  color: #f4eaea;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .zaglavlje-sadrzaj {
+    min-height: 64px;
+  }
+
+  .navigacija {
+    gap: 12px;
+    font-size: 0.9rem;
+  }
+
+  .hero-sekcija {
+    padding: 72px 20px;
+  }
+
+  .informacije-salona {
+    flex-direction: column;
+  }
+
+  .usluge-sekcija {
+    padding: 64px 0;
+  }
+
+  .usluga-vrh {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
