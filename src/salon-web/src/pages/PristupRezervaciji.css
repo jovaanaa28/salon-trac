@@ -268,6 +268,35 @@
 .pristup-sekundarno-dugme:hover {
   background: #f5ebec;
 }
+
+.pristup-upravljanje {
+ margin-top: 22px;
+ padding: 18px;
+ background: #f8f3f2;
+ border-radius: 11px;
+ text-align: center;
+}
+.pristup-upravljanje-dugme {
+ min-height: 46px;
+ padding: 0 20px;
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ color: white;
+ background: #80535e;
+ border-radius: 9px;
+ text-decoration: none;
+ font-weight: 800;
+}
+.pristup-upravljanje-dugme:hover {
+ background: #68424c;
+}
+.pristup-upravljanje p {
+ margin: 10px 0 0;
+ color: #74666a;
+ line-height: 1.5;
+}
+
 @media (max-width: 650px) {
   .pristup-rezervaciji-sadrzaj {
     padding: 40px 0 65px;

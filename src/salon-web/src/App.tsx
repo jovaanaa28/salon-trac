@@ -16,6 +16,8 @@ import RezervacijaUspesna from "./pages/RezervacijaUspesna";
 
 import PristupRezervaciji from "./pages/PristupRezervaciji";
 
+import UpravljanjeRezervacijom from "./pages/UpravljanjeRezervacijom";
+
 import "./App.css";
 
 function App() {
@@ -32,7 +34,11 @@ function App() {
 
       <Route path="/moja-rezervacija" element={<PristupRezervaciji />} />
 
-      
+      <Route
+        path="/upravljanje-rezervacijom"
+        element={<UpravljanjeRezervacijom />}
+      />
+
       <Route
         path="/administracija/osnovne-informacije"
         element={<AdminOsnovneInformacije />}
