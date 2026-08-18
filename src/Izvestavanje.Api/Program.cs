@@ -1,4 +1,5 @@
 using Izvestavanje.Api.Podaci;
+using Izvestavanje.Api.PozadinskiServisi;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,9 @@ builder.Services.AddDbContext<IzvestavanjeKontekst>(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
+
+// A2 slusa dogadjaje o rezervacijama iz RabbitMQ-a
+builder.Services.AddHostedService<RabbitMqRezervacijaConsumer>();
 
 var app = builder.Build();
 
