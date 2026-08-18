@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Izvestavanje.Api/Izvestavanje.Api.csproj" />
     <Project Path="src/Salon.Api/Salon.Api.csproj" />
     <Project Path="src/Salon.Domen/Salon.Domen.csproj" />
     <Project Path="src/Salon.Infrastruktura/Salon.Infrastruktura.csproj" />
