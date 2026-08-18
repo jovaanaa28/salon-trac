@@ -19,11 +19,13 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-// Idempotentna obrada RabbitMQ dogadjaja
 builder.Services.AddScoped<IdempotencijaDogadjajaService>();
 
-// A2 slusa dogadjaje o rezervacijama iz RabbitMQ-a
-builder.Services.AddHostedService<RabbitMqRezervacijaConsumer>();
+builder.Services.AddScoped<
+    ObradaKreiraneRezervacijeService>();
+
+builder.Services.AddHostedService<
+    RabbitMqRezervacijaConsumer>();
 
 var app = builder.Build();
 

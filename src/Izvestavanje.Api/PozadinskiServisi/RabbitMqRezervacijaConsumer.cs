@@ -3,6 +3,7 @@ using System.Text.Json;
 using Izvestavanje.Api.Servisi;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Zajednicko.Poruke.Dogadjaji;
 
 namespace Izvestavanje.Api.PozadinskiServisi;
 
@@ -53,7 +54,8 @@ public class RabbitMqRezervacijaConsumer(
         try
         {
             await using var connection =
-                await factory.CreateConnectionAsync(stoppingToken);
+                await factory.CreateConnectionAsync(
+                    stoppingToken);
 
             await using var channel =
                 await connection.CreateChannelAsync(
@@ -111,9 +113,10 @@ public class RabbitMqRezervacijaConsumer(
                                 IdempotencijaDogadjajaService>();
 
                     var vecObradjen =
-                        await idempotencija.JeObradjenAsync(
-                            dogadjajId,
-                            ea.CancellationToken);
+                        await idempotencija
+                            .JeObradjenAsync(
+                                dogadjajId,
+                                ea.CancellationToken);
 
                     if (vecObradjen)
                     {
@@ -131,17 +134,55 @@ public class RabbitMqRezervacijaConsumer(
                         return;
                     }
 
-                    logger.LogInformation(
-                        "Primljen novi dogadjaj {DogadjajId}, " +
-                        "tip {RoutingKey}. " +
-                        "Obrada ce biti dodata u narednom tasku.",
-                        dogadjajId,
-                        ea.RoutingKey);
+                    if (ea.RoutingKey ==
+                        "rezervacija.kreirana")
+                    {
+                        var dogadjaj =
+                            JsonSerializer.Deserialize<
+                                RezervacijaKreiranaDogadjaj>(
+                                json);
 
-                    // TASK 50:
-                    // Novi dogadjaj jos NE potvrđujemo.
-                    // TASK 51 ce ga obraditi, evidentirati
-                    // u ObradjeniDogadjaji i tek tada ACK-ovati.
+                        if (dogadjaj == null)
+                        {
+                            throw new ArgumentException(
+                                "Dogadjaj kreiranja nije validan.");
+                        }
+
+                        if (dogadjaj.DogadjajId != dogadjajId)
+                        {
+                            throw new ArgumentException(
+                                "DogadjajId nije konzistentan.");
+                        }
+
+                        var obrada =
+                            scope.ServiceProvider
+                                .GetRequiredService<
+                                    ObradaKreiraneRezervacijeService>();
+
+                        await obrada.ObradiAsync(
+                            dogadjaj,
+                            ea.CancellationToken);
+
+                        await channel.BasicAckAsync(
+                            ea.DeliveryTag,
+                            multiple: false,
+                            cancellationToken:
+                                ea.CancellationToken);
+
+                        logger.LogInformation(
+                            "Rezervacija {RezervacijaId} " +
+                            "sinhronizovana u A2. " +
+                            "Dogadjaj {DogadjajId} je ACK-ovan.",
+                            dogadjaj.RezervacijaId,
+                            dogadjaj.DogadjajId);
+
+                        return;
+                    }
+
+                    logger.LogInformation(
+                        "Dogadjaj tipa {RoutingKey} jos nije podrzan. " +
+                        "Poruka ostaje nepotvrdjena.",
+                        ea.RoutingKey);
                 }
                 catch (JsonException ex)
                 {
@@ -160,7 +201,7 @@ public class RabbitMqRezervacijaConsumer(
                 {
                     logger.LogWarning(
                         ex,
-                        "RabbitMQ dogadjaj nema validan DogadjajId.");
+                        "RabbitMQ dogadjaj nije validan.");
 
                     await channel.BasicNackAsync(
                         ea.DeliveryTag,
@@ -173,10 +214,11 @@ public class RabbitMqRezervacijaConsumer(
                 {
                     logger.LogError(
                         ex,
-                        "Greska tokom provere idempotencije dogadjaja.");
+                        "Greska tokom obrade RabbitMQ dogadjaja.");
 
-                    // Poruku ne ACK-ujemo.
-                    // Ostaje neobradjena dok se konekcija ne zatvori.
+                    // Ne ACK-ujemo poruku.
+                    // Kada se konekcija zatvori,
+                    // RabbitMQ ce je ponovo ponuditi.
                 }
             };
 
@@ -219,8 +261,8 @@ public class RabbitMqRezervacijaConsumer(
                 "Dogadjaj nema polje DogadjajId.");
         }
 
-        if (dogadjajIdElement.ValueKind
-            != JsonValueKind.String)
+        if (dogadjajIdElement.ValueKind !=
+            JsonValueKind.String)
         {
             throw new ArgumentException(
                 "DogadjajId nije ispravnog tipa.");
