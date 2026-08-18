@@ -1,3 +1,6 @@
+using System.Text;
+using System.Text.Json;
+using Izvestavanje.Api.Servisi;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -5,7 +8,8 @@ namespace Izvestavanje.Api.PozadinskiServisi;
 
 public class RabbitMqRezervacijaConsumer(
     ILogger<RabbitMqRezervacijaConsumer> logger,
-    IConfiguration configuration)
+    IConfiguration configuration,
+    IServiceScopeFactory scopeFactory)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(
@@ -78,8 +82,6 @@ public class RabbitMqRezervacijaConsumer(
                 arguments: null,
                 cancellationToken: stoppingToken);
 
-            // Dok ne uvedemo pravu obradu, uzimamo najvise
-            // jednu poruku iz queue-a.
             await channel.BasicQosAsync(
                 prefetchSize: 0,
                 prefetchCount: 1,
@@ -89,18 +91,93 @@ public class RabbitMqRezervacijaConsumer(
             var consumer =
                 new AsyncEventingBasicConsumer(channel);
 
-            consumer.ReceivedAsync += (_, ea) =>
+            consumer.ReceivedAsync += async (_, ea) =>
             {
-                logger.LogInformation(
-                    "Primljen RabbitMQ dogadjaj {RoutingKey}. " +
-                    "Obrada poruke bice dodata u narednim taskovima.",
-                    ea.RoutingKey);
+                try
+                {
+                    var json =
+                        Encoding.UTF8.GetString(
+                            ea.Body.ToArray());
 
-                // TASK 49:
-                // Namerno nema ACK-a.
-                // Poruka ostaje neobradjena i vratice se u queue
-                // kada se konekcija zatvori.
-                return Task.CompletedTask;
+                    var dogadjajId =
+                        ProcitajDogadjajId(json);
+
+                    using var scope =
+                        scopeFactory.CreateScope();
+
+                    var idempotencija =
+                        scope.ServiceProvider
+                            .GetRequiredService<
+                                IdempotencijaDogadjajaService>();
+
+                    var vecObradjen =
+                        await idempotencija.JeObradjenAsync(
+                            dogadjajId,
+                            ea.CancellationToken);
+
+                    if (vecObradjen)
+                    {
+                        logger.LogInformation(
+                            "Dogadjaj {DogadjajId} je vec obradjen. " +
+                            "Poruka se preskace.",
+                            dogadjajId);
+
+                        await channel.BasicAckAsync(
+                            ea.DeliveryTag,
+                            multiple: false,
+                            cancellationToken:
+                                ea.CancellationToken);
+
+                        return;
+                    }
+
+                    logger.LogInformation(
+                        "Primljen novi dogadjaj {DogadjajId}, " +
+                        "tip {RoutingKey}. " +
+                        "Obrada ce biti dodata u narednom tasku.",
+                        dogadjajId,
+                        ea.RoutingKey);
+
+                    // TASK 50:
+                    // Novi dogadjaj jos NE potvrđujemo.
+                    // TASK 51 ce ga obraditi, evidentirati
+                    // u ObradjeniDogadjaji i tek tada ACK-ovati.
+                }
+                catch (JsonException ex)
+                {
+                    logger.LogWarning(
+                        ex,
+                        "RabbitMQ poruka nije validan JSON.");
+
+                    await channel.BasicNackAsync(
+                        ea.DeliveryTag,
+                        multiple: false,
+                        requeue: false,
+                        cancellationToken:
+                            ea.CancellationToken);
+                }
+                catch (ArgumentException ex)
+                {
+                    logger.LogWarning(
+                        ex,
+                        "RabbitMQ dogadjaj nema validan DogadjajId.");
+
+                    await channel.BasicNackAsync(
+                        ea.DeliveryTag,
+                        multiple: false,
+                        requeue: false,
+                        cancellationToken:
+                            ea.CancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(
+                        ex,
+                        "Greska tokom provere idempotencije dogadjaja.");
+
+                    // Poruku ne ACK-ujemo.
+                    // Ostaje neobradjena dok se konekcija ne zatvori.
+                }
             };
 
             await channel.BasicConsumeAsync(
@@ -111,7 +188,8 @@ public class RabbitMqRezervacijaConsumer(
 
             logger.LogInformation(
                 "A2 RabbitMQ consumer je pokrenut. " +
-                "Exchange: {Exchange}, Queue: {Queue}, Binding: rezervacija.#",
+                "Exchange: {Exchange}, Queue: {Queue}, " +
+                "Binding: rezervacija.#",
                 exchangeName,
                 queueName);
 
@@ -125,5 +203,43 @@ public class RabbitMqRezervacijaConsumer(
             logger.LogInformation(
                 "A2 RabbitMQ consumer je zaustavljen.");
         }
+    }
+
+    private static Guid ProcitajDogadjajId(
+        string json)
+    {
+        using var dokument =
+            JsonDocument.Parse(json);
+
+        if (!dokument.RootElement.TryGetProperty(
+                "DogadjajId",
+                out var dogadjajIdElement))
+        {
+            throw new ArgumentException(
+                "Dogadjaj nema polje DogadjajId.");
+        }
+
+        if (dogadjajIdElement.ValueKind
+            != JsonValueKind.String)
+        {
+            throw new ArgumentException(
+                "DogadjajId nije ispravnog tipa.");
+        }
+
+        if (!Guid.TryParse(
+                dogadjajIdElement.GetString(),
+                out var dogadjajId))
+        {
+            throw new ArgumentException(
+                "DogadjajId nije validan GUID.");
+        }
+
+        if (dogadjajId == Guid.Empty)
+        {
+            throw new ArgumentException(
+                "DogadjajId ne sme biti prazan.");
+        }
+
+        return dogadjajId;
     }
 }
