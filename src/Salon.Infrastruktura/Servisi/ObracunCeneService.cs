@@ -33,11 +33,11 @@ public class ObracunCeneService
             .FirstOrDefaultAsync(); 
  
         // Popust 10% vazi do administrativno zadatog datuma 
-        if (informacije?.DatumDoKadaVaziPopust != null && 
-            DateTime.Now <= informacije.DatumDoKadaVaziPopust.Value) 
-        { 
-            procenatPopusta += 10; 
-        } 
+        if (informacije?.DatumDoKadaVaziPopust != null &&
+                DateTime.Today <= informacije.DatumDoKadaVaziPopust.Value.Date)
+        {
+             procenatPopusta += 10;
+        }
  
         if (!string.IsNullOrWhiteSpace(promoKod)) 
         { 
