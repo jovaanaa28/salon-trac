@@ -19,10 +19,14 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddScoped<IdempotencijaDogadjajaService>();
+builder.Services.AddScoped<
+    IdempotencijaDogadjajaService>();
 
 builder.Services.AddScoped<
     ObradaKreiraneRezervacijeService>();
+
+builder.Services.AddScoped<
+    ObradaIzmenjeneRezervacijeService>();
 
 builder.Services.AddHostedService<
     RabbitMqRezervacijaConsumer>();

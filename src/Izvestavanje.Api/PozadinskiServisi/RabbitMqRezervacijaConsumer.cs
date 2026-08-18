@@ -148,7 +148,8 @@ public class RabbitMqRezervacijaConsumer(
                                 "Dogadjaj kreiranja nije validan.");
                         }
 
-                        if (dogadjaj.DogadjajId != dogadjajId)
+                        if (dogadjaj.DogadjajId !=
+                            dogadjajId)
                         {
                             throw new ArgumentException(
                                 "DogadjajId nije konzistentan.");
@@ -171,6 +172,52 @@ public class RabbitMqRezervacijaConsumer(
 
                         logger.LogInformation(
                             "Rezervacija {RezervacijaId} " +
+                            "sinhronizovana u A2. " +
+                            "Dogadjaj {DogadjajId} je ACK-ovan.",
+                            dogadjaj.RezervacijaId,
+                            dogadjaj.DogadjajId);
+
+                        return;
+                    }
+
+                    if (ea.RoutingKey ==
+                        "rezervacija.izmenjena")
+                    {
+                        var dogadjaj =
+                            JsonSerializer.Deserialize<
+                                RezervacijaIzmenjenaDogadjaj>(
+                                json);
+
+                        if (dogadjaj == null)
+                        {
+                            throw new ArgumentException(
+                                "Dogadjaj izmene nije validan.");
+                        }
+
+                        if (dogadjaj.DogadjajId !=
+                            dogadjajId)
+                        {
+                            throw new ArgumentException(
+                                "DogadjajId nije konzistentan.");
+                        }
+
+                        var obrada =
+                            scope.ServiceProvider
+                                .GetRequiredService<
+                                    ObradaIzmenjeneRezervacijeService>();
+
+                        await obrada.ObradiAsync(
+                            dogadjaj,
+                            ea.CancellationToken);
+
+                        await channel.BasicAckAsync(
+                            ea.DeliveryTag,
+                            multiple: false,
+                            cancellationToken:
+                                ea.CancellationToken);
+
+                        logger.LogInformation(
+                            "Izmena rezervacije {RezervacijaId} " +
                             "sinhronizovana u A2. " +
                             "Dogadjaj {DogadjajId} je ACK-ovan.",
                             dogadjaj.RezervacijaId,
@@ -216,9 +263,9 @@ public class RabbitMqRezervacijaConsumer(
                         ex,
                         "Greska tokom obrade RabbitMQ dogadjaja.");
 
-                    // Ne ACK-ujemo poruku.
-                    // Kada se konekcija zatvori,
-                    // RabbitMQ ce je ponovo ponuditi.
+                    // Poruka se ne ACK-uje.
+                    // Nakon zatvaranja konekcije RabbitMQ
+                    // ce je ponovo ponuditi consumer-u.
                 }
             };
 
