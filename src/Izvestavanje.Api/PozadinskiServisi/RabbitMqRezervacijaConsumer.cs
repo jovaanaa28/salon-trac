@@ -226,10 +226,63 @@ public class RabbitMqRezervacijaConsumer(
                         return;
                     }
 
-                    logger.LogInformation(
-                        "Dogadjaj tipa {RoutingKey} jos nije podrzan. " +
-                        "Poruka ostaje nepotvrdjena.",
+                    if (ea.RoutingKey ==
+                    "rezervacija.otkazana")
+                    {
+                        var dogadjaj =
+                            JsonSerializer.Deserialize<
+                                RezervacijaOtkazanaDogadjaj>(
+                                json);
+
+                        if (dogadjaj == null)
+                        {
+                            throw new ArgumentException(
+                                "Dogadjaj otkazivanja nije validan.");
+                        }
+
+                        if (dogadjaj.DogadjajId !=
+                            dogadjajId)
+                        {
+                            throw new ArgumentException(
+                                "DogadjajId nije konzistentan.");
+                        }
+
+                        var obrada =
+                            scope.ServiceProvider
+                                .GetRequiredService<
+                                    ObradaOtkazaneRezervacijeService>();
+
+                        await obrada.ObradiAsync(
+                            dogadjaj,
+                            ea.CancellationToken);
+
+                        await channel.BasicAckAsync(
+                            ea.DeliveryTag,
+                            multiple: false,
+                            cancellationToken:
+                                ea.CancellationToken);
+
+                        logger.LogInformation(
+                            "Otkazivanje rezervacije {RezervacijaId} " +
+                            "sinhronizovano u A2. " +
+                            "Dogadjaj {DogadjajId} je ACK-ovan.",
+                            dogadjaj.RezervacijaId,
+                            dogadjaj.DogadjajId);
+
+                        return;
+                    }
+
+                    logger.LogWarning(
+                        "Nepodrzan RabbitMQ dogadjaj tipa {RoutingKey}. " +
+                        "Poruka se odbacuje.",
                         ea.RoutingKey);
+
+                    await channel.BasicNackAsync(
+                        ea.DeliveryTag,
+                        multiple: false,
+                        requeue: false,
+                        cancellationToken:
+                            ea.CancellationToken);
                 }
                 catch (JsonException ex)
                 {

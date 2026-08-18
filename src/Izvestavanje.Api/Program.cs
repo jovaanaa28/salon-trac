@@ -28,6 +28,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ObradaIzmenjeneRezervacijeService>();
 
+builder.Services.AddScoped<
+    ObradaOtkazaneRezervacijeService>();
+
 builder.Services.AddHostedService<
     RabbitMqRezervacijaConsumer>();
 
