@@ -1,0 +1,96 @@
+﻿.aplikacija {
+  min-height: 100vh;
+}
+
+.zaglavlje {
+  padding: 64px max(24px, calc((100% - 1100px) / 2));
+  background: #241f20;
+  color: #ffffff;
+}
+
+.zaglavlje h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1;
+}
+
+.nadnaslov {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.podnaslov {
+  margin: 0;
+  max-width: 620px;
+  color: #ded8d6;
+  font-size: 1.05rem;
+}
+
+.sadrzaj {
+  width: min(1100px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 56px 0 80px;
+}
+
+.uvod {
+  max-width: 720px;
+}
+
+.uvod h2 {
+  margin: 8px 0 12px;
+  font-size: 2rem;
+}
+
+.uvod > p:last-child {
+  color: #635b59;
+  line-height: 1.7;
+}
+
+.kartice {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.kartica {
+  min-height: 220px;
+  padding: 28px;
+  border: 1px solid #ddd5d2;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 35px rgba(36, 31, 32, 0.06);
+}
+
+.kartica .broj {
+  display: inline-block;
+  margin-bottom: 30px;
+  color: #8e7771;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.kartica h3 {
+  margin: 0 0 12px;
+  font-size: 1.35rem;
+}
+
+.kartica p {
+  margin: 0;
+  color: #6c6462;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .kartice {
+    grid-template-columns: 1fr;
+  }
+
+  .zaglavlje {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+}
