@@ -50,4 +50,27 @@ public class IzvestajiController : ControllerBase
 
         return Ok(rezultat);
     }
+
+    [HttpGet("rezervacije-po-datumu")]
+    public async Task<
+        ActionResult<List<RezervacijePoDatumuDto>>>
+        RezervacijePoDatumu(
+            CancellationToken cancellationToken)
+    {
+        var rezultat =
+            await _kontekst.Rezervacije
+                .AsNoTracking()
+                .GroupBy(rezervacija =>
+                    rezervacija.DatumKreiranja.Date)
+                .Select(grupa =>
+                    new RezervacijePoDatumuDto
+                    {
+                        Datum = grupa.Key,
+                        BrojRezervacija = grupa.Count()
+                    })
+                .OrderBy(x => x.Datum)
+                .ToListAsync(cancellationToken);
+
+        return Ok(rezultat);
+    }
 }
