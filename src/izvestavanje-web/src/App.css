@@ -161,3 +161,14 @@
 .status-izvestaja.greska {
   color: #a32929;
 }
+
+.osvezavanje-info {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #eee8e5;
+  color: #5f5552;
+  font-size: 0.9rem;
+  font-weight: 600;
+}

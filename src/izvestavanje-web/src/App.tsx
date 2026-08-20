@@ -1,19 +1,15 @@
-﻿import './App.css'
+﻿import "./App.css";
 
-import RezervacijePoDatumuTabela
-  from './components/RezervacijePoDatumuTabela'
+import RezervacijePoDatumuTabela from "./components/RezervacijePoDatumuTabela";
 
-import TerminiPoKategorijiTabela
-  from './components/TerminiPoKategorijiTabela'
+import TerminiPoKategorijiTabela from "./components/TerminiPoKategorijiTabela";
 
 function App() {
   return (
     <div className="aplikacija">
       <header className="zaglavlje">
         <div>
-          <p className="nadnaslov">
-            Salon Trač · A.2
-          </p>
+          <p className="nadnaslov">Salon Trač · A.2</p>
 
           <h1>Izveštavanje</h1>
 
@@ -25,33 +21,30 @@ function App() {
 
       <main className="sadrzaj">
         <section className="uvod">
-          <p className="nadnaslov">
-            Upravljački pregled
-          </p>
+          <p className="nadnaslov">Upravljački pregled</p>
 
           <h2>Izveštaji salona</h2>
 
           <p>
-            Podaci se čuvaju u posebnoj A.2 bazi
-            i ažuriraju događajima primljenim
-            preko RabbitMQ-a.
+            Podaci se čuvaju u posebnoj A.2 bazi i ažuriraju događajima
+            primljenim preko RabbitMQ-a.
           </p>
+
+          <p className="osvezavanje-info">
+            Izveštaji se automatski osvežavaju na svakih 5 sekundi.
+          </p>
+          
         </section>
 
         <section className="izvestaj-sekcija">
           <div className="izvestaj-naslov">
-            <span className="broj">
-              01
-            </span>
+            <span className="broj">01</span>
 
             <div>
-              <h3>
-                Termini po kategoriji
-              </h3>
+              <h3>Termini po kategoriji</h3>
 
               <p>
-                Trenutno rezervisani termini
-                grupisani po kategoriji usluge.
+                Trenutno rezervisani termini grupisani po kategoriji usluge.
               </p>
             </div>
           </div>
@@ -61,18 +54,13 @@ function App() {
 
         <section className="izvestaj-sekcija">
           <div className="izvestaj-naslov">
-            <span className="broj">
-              02
-            </span>
+            <span className="broj">02</span>
 
             <div>
-              <h3>
-                Rezervacije po datumu
-              </h3>
+              <h3>Rezervacije po datumu</h3>
 
               <p>
-                Broj rezervacija grupisan prema
-                originalnom datumu kreiranja.
+                Broj rezervacija grupisan prema originalnom datumu kreiranja.
               </p>
             </div>
           </div>
@@ -81,7 +69,7 @@ function App() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

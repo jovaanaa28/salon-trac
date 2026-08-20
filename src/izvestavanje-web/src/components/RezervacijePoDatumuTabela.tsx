@@ -8,6 +8,8 @@ import {
   getRezervacijePoDatumu,
 } from '../services/izvestajiService'
 
+const OSVEZAVANJE_MS = 5000
+
 function formatirajDatum(datum: string) {
   const deoDatuma = datum.substring(0, 10)
 
@@ -38,11 +40,23 @@ function RezervacijePoDatumuTabela() {
 
   useEffect(() => {
     let aktivnaKomponenta = true
+    let zahtevUToku = false
+    let prvoUcitavanje = true
 
     async function ucitaj() {
+      if (zahtevUToku) {
+        return
+      }
+
+      zahtevUToku = true
+
       try {
-        setUcitavanje(true)
-        setGreska(null)
+        if (
+          aktivnaKomponenta &&
+          prvoUcitavanje
+        ) {
+          setUcitavanje(true)
+        }
 
         const rezultat =
           await getRezervacijePoDatumu()
@@ -52,6 +66,7 @@ function RezervacijePoDatumuTabela() {
         }
 
         setRezervacije(rezultat)
+        setGreska(null)
       } catch (error) {
         if (!aktivnaKomponenta) {
           return
@@ -65,16 +80,30 @@ function RezervacijePoDatumuTabela() {
           )
         }
       } finally {
-        if (aktivnaKomponenta) {
+        if (
+          aktivnaKomponenta &&
+          prvoUcitavanje
+        ) {
           setUcitavanje(false)
+          prvoUcitavanje = false
         }
+
+        zahtevUToku = false
       }
     }
 
     void ucitaj()
 
+    const intervalId = window.setInterval(
+      () => {
+        void ucitaj()
+      },
+      OSVEZAVANJE_MS,
+    )
+
     return () => {
       aktivnaKomponenta = false
+      window.clearInterval(intervalId)
     }
   }, [])
 
@@ -116,7 +145,11 @@ function RezervacijePoDatumuTabela() {
           {rezervacije.map((stavka) => (
             <tr key={stavka.datum}>
               <td>
-                {formatirajDatum(stavka.datum)}
+                {
+                  formatirajDatum(
+                    stavka.datum,
+                  )
+                }
               </td>
 
               <td>

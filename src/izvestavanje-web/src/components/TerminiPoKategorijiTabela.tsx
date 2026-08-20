@@ -1,50 +1,51 @@
 import { useEffect, useState } from 'react'
-
 import type {
   TerminiPoKategoriji,
 } from '../models/TerminiPoKategoriji'
-
 import {
   getTerminiPoKategoriji,
 } from '../services/izvestajiService'
-
+const OSVEZAVANJE_MS = 5000
 function TerminiPoKategorijiTabela() {
   const [
     termini,
     setTermini,
   ] = useState<TerminiPoKategoriji[]>([])
-
   const [
     ucitavanje,
     setUcitavanje,
   ] = useState(true)
-
   const [
     greska,
     setGreska,
   ] = useState<string | null>(null)
-
   useEffect(() => {
     let aktivnaKomponenta = true
-
+    let zahtevUToku = false
+    let prvoUcitavanje = true
     async function ucitaj() {
+      if (zahtevUToku) {
+        return
+      }
+      zahtevUToku = true
       try {
-        setUcitavanje(true)
-        setGreska(null)
-
+        if (
+          aktivnaKomponenta &&
+          prvoUcitavanje
+        ) {
+          setUcitavanje(true)
+        }
         const rezultat =
           await getTerminiPoKategoriji()
-
         if (!aktivnaKomponenta) {
           return
         }
-
         setTermini(rezultat)
+        setGreska(null)
       } catch (error) {
         if (!aktivnaKomponenta) {
           return
         }
-
         if (error instanceof Error) {
           setGreska(error.message)
         } else {
@@ -53,19 +54,28 @@ function TerminiPoKategorijiTabela() {
           )
         }
       } finally {
-        if (aktivnaKomponenta) {
+        if (
+          aktivnaKomponenta &&
+          prvoUcitavanje
+        ) {
           setUcitavanje(false)
+          prvoUcitavanje = false
         }
+        zahtevUToku = false
       }
     }
-
     void ucitaj()
-
+    const intervalId = window.setInterval(
+      () => {
+        void ucitaj()
+      },
+      OSVEZAVANJE_MS,
+    )
     return () => {
       aktivnaKomponenta = false
+      window.clearInterval(intervalId)
     }
   }, [])
-
   if (ucitavanje) {
     return (
       <p className="status-izvestaja">
@@ -73,7 +83,6 @@ function TerminiPoKategorijiTabela() {
       </p>
     )
   }
-
   if (greska) {
     return (
       <p className="status-izvestaja greska">
@@ -81,7 +90,6 @@ function TerminiPoKategorijiTabela() {
       </p>
     )
   }
-
   if (termini.length === 0) {
     return (
       <p className="status-izvestaja">
@@ -89,26 +97,32 @@ function TerminiPoKategorijiTabela() {
       </p>
     )
   }
-
   return (
     <div className="tabela-okvir">
       <table className="izvestaj-tabela">
         <thead>
           <tr>
             <th>Kategorija usluge</th>
-            <th>Broj rezervisanih termina</th>
+            <th>
+              Broj rezervisanih termina
+            </th>
           </tr>
         </thead>
-
         <tbody>
           {termini.map((stavka) => (
-            <tr key={stavka.kategorijaUslugeId}>
+            <tr
+              key={
+                stavka.kategorijaUslugeId
+              }
+            >
               <td>
                 {stavka.nazivKategorije}
               </td>
-
               <td>
-                {stavka.brojRezervisanihTermina}
+                {
+                  stavka
+                    .brojRezervisanihTermina
+                }
               </td>
             </tr>
           ))}
@@ -117,5 +131,4 @@ function TerminiPoKategorijiTabela() {
     </div>
   )
 }
-
 export default TerminiPoKategorijiTabela
