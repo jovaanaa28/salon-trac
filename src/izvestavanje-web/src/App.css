@@ -94,3 +94,70 @@
     padding-bottom: 48px;
   }
 }
+.izvestaj-sekcija {
+  margin-top: 32px;
+  padding: 28px;
+  border: 1px solid #ddd5d2;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 35px rgba(36, 31, 32, 0.06);
+}
+
+.izvestaj-naslov {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.izvestaj-naslov .broj {
+  color: #8e7771;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.izvestaj-naslov h3 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+}
+
+.izvestaj-naslov p {
+  margin: 0;
+  color: #6c6462;
+  line-height: 1.6;
+}
+
+.tabela-okvir {
+  overflow-x: auto;
+}
+
+.izvestaj-tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.izvestaj-tabela th,
+.izvestaj-tabela td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e7e0dd;
+  text-align: left;
+}
+
+.izvestaj-tabela th {
+  background: #f7f4f2;
+  font-size: 0.85rem;
+}
+
+.izvestaj-tabela td:last-child,
+.izvestaj-tabela th:last-child {
+  text-align: right;
+}
+
+.status-izvestaja {
+  margin: 20px 0 0;
+  color: #6c6462;
+}
+
+.status-izvestaja.greska {
+  color: #a32929;
+}

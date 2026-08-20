@@ -1,5 +1,8 @@
 ﻿import './App.css'
 
+import TerminiPoKategorijiTabela
+  from './components/TerminiPoKategorijiTabela'
+
 function App() {
   return (
     <div className="aplikacija">
@@ -26,34 +29,50 @@ function App() {
           <h2>Izveštaji salona</h2>
 
           <p>
-            Aplikacija za izveštavanje koristi sopstvenu bazu
-            podataka koju A.2 ažurira na osnovu događaja
-            primljenih preko RabbitMQ-a.
+            Podaci se čuvaju u posebnoj A.2 bazi
+            i ažuriraju događajima primljenim
+            preko RabbitMQ-a.
           </p>
         </section>
 
-        <section className="kartice">
-          <article className="kartica">
-            <span className="broj">01</span>
+        <section className="izvestaj-sekcija">
+          <div className="izvestaj-naslov">
+            <span className="broj">
+              01
+            </span>
 
-            <h3>Termini po kategoriji</h3>
+            <div>
+              <h3>
+                Termini po kategoriji
+              </h3>
 
-            <p>
-              Pregled trenutno rezervisanih termina
-              grupisanih po kategoriji usluge.
-            </p>
-          </article>
+              <p>
+                Trenutno rezervisani termini
+                grupisani po kategoriji usluge.
+              </p>
+            </div>
+          </div>
 
-          <article className="kartica">
-            <span className="broj">02</span>
+          <TerminiPoKategorijiTabela />
+        </section>
 
-            <h3>Rezervacije po datumu</h3>
+        <section className="izvestaj-sekcija">
+          <div className="izvestaj-naslov">
+            <span className="broj">
+              02
+            </span>
 
-            <p>
-              Istorijski pregled broja rezervacija
-              prema originalnom datumu kreiranja.
-            </p>
-          </article>
+            <div>
+              <h3>
+                Rezervacije po datumu
+              </h3>
+
+              <p>
+                Istorijski pregled rezervacija
+                biće prikazan u sledećem zadatku.
+              </p>
+            </div>
+          </div>
         </section>
       </main>
     </div>

@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string IzvestavanjeFrontendCors =
+    "IzvestavanjeFrontendCors";
+
 var connectionString =
     builder.Configuration.GetConnectionString("IzvestavanjeBaza")
     ?? throw new InvalidOperationException(
@@ -18,6 +21,19 @@ builder.Services.AddDbContext<IzvestavanjeKontekst>(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        IzvestavanjeFrontendCors,
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5174")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 builder.Services.AddScoped<
     IdempotencijaDogadjajaService>();
@@ -42,6 +58,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(IzvestavanjeFrontendCors);
 
 app.UseAuthorization();
 
