@@ -1,5 +1,8 @@
 ﻿import './App.css'
 
+import RezervacijePoDatumuTabela
+  from './components/RezervacijePoDatumuTabela'
+
 import TerminiPoKategorijiTabela
   from './components/TerminiPoKategorijiTabela'
 
@@ -68,11 +71,13 @@ function App() {
               </h3>
 
               <p>
-                Istorijski pregled rezervacija
-                biće prikazan u sledećem zadatku.
+                Broj rezervacija grupisan prema
+                originalnom datumu kreiranja.
               </p>
             </div>
           </div>
+
+          <RezervacijePoDatumuTabela />
         </section>
       </main>
     </div>
