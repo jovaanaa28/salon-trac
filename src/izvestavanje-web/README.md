@@ -4,6 +4,7 @@ Poseban React + TypeScript frontend za A.2 aplikaciju za izveštavanje.
 ```powershell
 npm install
 npm run dev
+```
 Frontend:
 http://localhost:5174
 A.2 API:
