@@ -268,11 +268,8 @@ function NovaRezervacija() {
         stavka.kljuc === kljuc
           ? {
               ...stavka,
-
               termini: [],
-
               vremePocetka: "",
-
               ucitavanjeTermina: true,
             }
           : stavka,
@@ -332,7 +329,6 @@ function NovaRezervacija() {
 
   function promeniUslugu(
     kljuc: number,
-
     uslugaId: string,
   ) {
     const trenutnaStavka = stavke.find((stavka) => stavka.kljuc === kljuc);

@@ -9,7 +9,7 @@ function App() {
     <div className="aplikacija">
       <header className="zaglavlje">
         <div>
-          <p className="nadnaslov">Salon Trač · A.2</p>
+          <p className="nadnaslov">Salon Trač</p>
 
           <h1>Izveštavanje</h1>
 
@@ -25,10 +25,6 @@ function App() {
 
           <h2>Izveštaji salona</h2>
 
-          <p>
-            Podaci se čuvaju u posebnoj A.2 bazi i ažuriraju događajima
-            primljenim preko RabbitMQ-a.
-          </p>
 
           <p className="osvezavanje-info">
             Izveštaji se automatski osvežavaju na svakih 5 sekundi.
